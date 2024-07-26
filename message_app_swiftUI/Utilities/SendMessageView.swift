@@ -55,7 +55,7 @@ struct SendMessageView: View {
             }
             .padding(.horizontal, 10)
             .padding(.bottom)
-            .background(Color.gray)
+            .background(Color.grayColor)
         }
     }
 }
