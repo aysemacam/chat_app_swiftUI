@@ -46,6 +46,9 @@ struct MediaMessageView: View {
     var body: some View {
         HStack {
             getMediaView()
+                .frame(width: 100, height: 150)
+                .cornerRadius(12)
+                .clipped()
                 .frame(maxWidth: .infinity, alignment: isIncoming ? .leading : .trailing)
                 .padding(.horizontal)
         }
@@ -57,17 +60,14 @@ struct MediaMessageView: View {
         case .photo(let image):
             Image(uiImage: image)
                 .resizable()
-                .scaledToFit()
-                .frame(maxWidth: 200, maxHeight: 200)
-                .cornerRadius(12)
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 140, height: 170)
         case .video(let url):
             VideoPlayerView(url: url)
-                .frame(maxWidth: 200, maxHeight: 200)
-                .cornerRadius(12)
+                .frame(width: 140, height: 170)
         case .audio(let url):
             AudioPlayerView(url: url)
                 .frame(maxWidth: 200, maxHeight: 50)
-                .cornerRadius(12)
         }
     }
 }

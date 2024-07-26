@@ -9,7 +9,7 @@ import SwiftUI
 import UIKit
 
 struct ImagePicker: UIViewControllerRepresentable {
-    var didFinishPicking: (UIImage?) -> Void
+    var didFinishPicking: (UIImage?, URL?) -> Void
     
     func makeCoordinator() -> Coordinator {
         Coordinator(didFinishPicking: didFinishPicking)
@@ -25,17 +25,19 @@ struct ImagePicker: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
     
     class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-        var didFinishPicking: (UIImage?) -> Void
+        var didFinishPicking: (UIImage?, URL?) -> Void
         
-        init(didFinishPicking: @escaping (UIImage?) -> Void) {
+        init(didFinishPicking: @escaping (UIImage?, URL?) -> Void) {
             self.didFinishPicking = didFinishPicking
         }
         
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             if let uiImage = info[.originalImage] as? UIImage {
-                didFinishPicking(uiImage)
+                didFinishPicking(uiImage, nil)
+            } else if let videoURL = info[.mediaURL] as? URL {
+                didFinishPicking(nil, videoURL)
             } else {
-                didFinishPicking(nil)
+                didFinishPicking(nil, nil)
             }
             picker.dismiss(animated: true)
         }

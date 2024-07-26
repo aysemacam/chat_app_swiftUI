@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		56A2D3F72C5385C0004860E7 /* PopOverButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A2D3F62C5385C0004860E7 /* PopOverButtons.swift */; };
+		56A2D3F92C5397FE004860E7 /* CustomCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A2D3F82C5397FE004860E7 /* CustomCameraView.swift */; };
+		56A2D3FC2C5399D0004860E7 /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A2D3FB2C5399D0004860E7 /* CameraManager.swift */; };
 		56BE74092C52586C0026695C /* message_app_swiftUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BE74082C52586C0026695C /* message_app_swiftUIApp.swift */; };
 		56BE740B2C52586C0026695C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BE740A2C52586C0026695C /* ContentView.swift */; };
 		56BE740D2C52586E0026695C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 56BE740C2C52586E0026695C /* Assets.xcassets */; };
@@ -24,6 +27,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		56A2D3F62C5385C0004860E7 /* PopOverButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopOverButtons.swift; sourceTree = "<group>"; };
+		56A2D3F82C5397FE004860E7 /* CustomCameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCameraView.swift; sourceTree = "<group>"; };
+		56A2D3FA2C539911004860E7 /* message-app-swiftUI-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "message-app-swiftUI-Info.plist"; sourceTree = SOURCE_ROOT; };
+		56A2D3FB2C5399D0004860E7 /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
 		56BE74052C52586C0026695C /* message_app_swiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = message_app_swiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		56BE74082C52586C0026695C /* message_app_swiftUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = message_app_swiftUIApp.swift; sourceTree = "<group>"; };
 		56BE740A2C52586C0026695C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -75,6 +82,7 @@
 		56BE74072C52586C0026695C /* message_app_swiftUI */ = {
 			isa = PBXGroup;
 			children = (
+				56A2D3FA2C539911004860E7 /* message-app-swiftUI-Info.plist */,
 				56BE74082C52586C0026695C /* message_app_swiftUIApp.swift */,
 				56BE740A2C52586C0026695C /* ContentView.swift */,
 				56BE740C2C52586E0026695C /* Assets.xcassets */,
@@ -108,6 +116,8 @@
 				56BE74262C52A52C0026695C /* ImagePicker.swift */,
 				56BE74282C52A54E0026695C /* VideoPlayerView.swift */,
 				56BE742A2C52A56A0026695C /* AudioPlayerView.swift */,
+				56A2D3F62C5385C0004860E7 /* PopOverButtons.swift */,
+				56A2D3F82C5397FE004860E7 /* CustomCameraView.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -124,6 +134,7 @@
 			isa = PBXGroup;
 			children = (
 				56BE742D2C52A5990026695C /* KeyboardManager.swift */,
+				56A2D3FB2C5399D0004860E7 /* CameraManager.swift */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -212,7 +223,10 @@
 				56BE740B2C52586C0026695C /* ContentView.swift in Sources */,
 				56BE74292C52A54E0026695C /* VideoPlayerView.swift in Sources */,
 				56BE742E2C52A5990026695C /* KeyboardManager.swift in Sources */,
+				56A2D3FC2C5399D0004860E7 /* CameraManager.swift in Sources */,
 				56BE74272C52A52C0026695C /* ImagePicker.swift in Sources */,
+				56A2D3F72C5385C0004860E7 /* PopOverButtons.swift in Sources */,
+				56A2D3F92C5397FE004860E7 /* CustomCameraView.swift in Sources */,
 				56BE74092C52586C0026695C /* message_app_swiftUIApp.swift in Sources */,
 				56BE74232C5272BD0026695C /* Color+Extensions.swift in Sources */,
 			);
@@ -351,6 +365,9 @@
 				DEVELOPMENT_TEAM = ZHQ4442GZL;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "message-app-swiftUI-Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = test;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = test;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -380,6 +397,9 @@
 				DEVELOPMENT_TEAM = ZHQ4442GZL;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "message-app-swiftUI-Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = test;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = test;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
