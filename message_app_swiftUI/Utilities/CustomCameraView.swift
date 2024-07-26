@@ -156,24 +156,14 @@ struct CaptureButton: View {
 }
 
 struct CameraPreview: UIViewRepresentable {
-    class VideoPreviewView: UIView {
-        override class var layerClass: AnyClass {
-            return AVCaptureVideoPreviewLayer.self
-        }
-        
-        var videoPreviewLayer: AVCaptureVideoPreviewLayer {
-            return layer as! AVCaptureVideoPreviewLayer
-        }
-    }
-    
     @ObservedObject var cameraManager: CameraManager
     
-    func makeUIView(context: Context) -> VideoPreviewView {
-        let view = VideoPreviewView()
-        view.videoPreviewLayer.session = cameraManager.previewLayer.session
-        view.videoPreviewLayer.videoGravity = .resizeAspectFill
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView(frame: UIScreen.main.bounds)
+        cameraManager.previewLayer.frame = view.bounds
+        view.layer.addSublayer(cameraManager.previewLayer)
         return view
     }
     
-    func updateUIView(_ uiView: VideoPreviewView, context: Context) {}
+    func updateUIView(_ uiView: UIView, context: Context) {}
 }
