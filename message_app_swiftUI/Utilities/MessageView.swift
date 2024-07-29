@@ -1,8 +1,16 @@
+//
+//  MessageView.swift
+//  message_app_swiftUI
+//
+//  Created by Aysema Çam on 26.07.2024.
+//
+
 import SwiftUI
+import Contacts
+import ContactsUI
 import AVFoundation
 import Combine
-
-var globalKeyboardHeight: CGFloat = 0.0
+import CoreLocation
 
 struct MessageView: View {
     @State private var messages: [ChatMessage] = []
@@ -10,10 +18,15 @@ struct MessageView: View {
     @State private var isShowingImagePicker = false
     @State private var isShowingCameraView = false
     @State private var isRecordingAudio = false
-    @State private var audioRecorder: AVAudioRecorder?
     @StateObject private var keyboardManager = KeyboardManager()
     @State private var showButtonsView = false
-    
+    @State private var isShowingContactPicker = false
+    @State private var selectedContact: CNContact?
+    @StateObject private var locationManager = LocationManager()
+    @State private var isShowingMapPicker = false
+    @State private var selectedLocation: CLLocationCoordinate2D?
+    @StateObject private var audioRecorderManager = AudioRecorderManager()
+
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
@@ -27,22 +40,23 @@ struct MessageView: View {
                     if showButtonsView {
                         VStack {
                             HStack {
-                                PopOverButtons(galleryAction: showGallery)
-                                    .frame(width: 110, height: 120)
-                                    .background(Color.white.opacity(0.5))
-                                    .cornerRadius(10)
-                                    .shadow(radius: 1)
+                                PopOverButtons(
+                                    galleryAction: showGallery,
+                                    contactAction: showContactPicker,
+                                    sendLocationAction: { _ in
+                                        isShowingMapPicker = true
+                                    }
+                                )
+                                .frame(width: 110, height: 120)
+                                .background(Color.white.opacity(0.5))
+                                .cornerRadius(10)
+                                .shadow(radius: 1)
                                 Spacer()
                             }
                             .padding(.leading)
                         }
                         .background(Color.clear)
                         .edgesIgnoringSafeArea(.all)
-                        .onTapGesture {
-                            withAnimation {
-                                showButtonsView = false
-                            }
-                        }
                     }
                     SendMessageView(
                         lastMessage: $lastMessage,
@@ -54,9 +68,9 @@ struct MessageView: View {
                     .background(Color.gray)
                     .onAppear {
                         startReceivingMessages()
+                        locationManager.requestLocationPermission()
                     }
                 }
-
             }
             .background(Color.lightGray)
             .sheet(isPresented: $isShowingImagePicker) {
@@ -67,10 +81,43 @@ struct MessageView: View {
             .fullScreenCover(isPresented: $isShowingCameraView) {
                 CustomCameraView(isPresented: $isShowingCameraView, didFinishPicking: handleImagePicked)
             }
-            .onReceive(keyboardManager.$keyboardHeight) { height in
-                globalKeyboardHeight = height
+            .sheet(isPresented: $isShowingContactPicker) {
+                ContactPickerView(isPresented: $isShowingContactPicker, selectedContact: $selectedContact)
             }
- 
+            .sheet(isPresented: $isShowingMapPicker) {
+                MapPickerView(isPresented: $isShowingMapPicker, selectedLocation: $selectedLocation)
+            }
+           
+            .onChange(of: selectedContact) { contact in
+                if let contact = contact {
+                    handleContactSelected(contact: contact)
+                }
+            }
+        }
+        .onReceive(locationManager.$userLocation) { newLocation in
+            if let newLocation = newLocation {
+            } else {
+                print("Cannot find location info.")
+            }
+        }
+        .onReceive(locationManager.$locationStatus) { status in
+            if status == .denied || status == .restricted {
+                print("Location Not accepted.")
+            } else if status == .notDetermined {
+                locationManager.requestLocationPermission()
+            } else if status == .authorizedWhenInUse || status == .authorizedAlways {
+                locationManager.startUpdatingLocation()
+            }
+        }
+        .onReceive(locationManager.$locationError) { error in
+            if let error = error {
+                print("Location Error: \(error.localizedDescription)")
+            }
+        }
+        .onChange(of: selectedLocation) { location in
+            if let location = location {
+                sendLocation(location: location)
+            }
         }
     }
     
@@ -96,46 +143,21 @@ struct MessageView: View {
         isShowingImagePicker = true
     }
     
+    private func showContactPicker() {
+        isShowingContactPicker = true
+    }
+    
     private func toggleRecording() {
-        if isRecordingAudio {
-            stopRecording()
+        if audioRecorderManager.isRecording {
+            if let url = audioRecorderManager.stopRecording() {
+                print("Recorded audio file: \(url)")
+                let media = ChatMedia(type: .audio(url))
+                let message = ChatMessage(media: media, isIncoming: false)
+                messages.append(message)
+            }
         } else {
-            startRecording()
+            audioRecorderManager.startRecording()
         }
-    }
-    
-    private func startRecording() {
-        let audioSession = AVAudioSession.sharedInstance()
-        do {
-            try audioSession.setCategory(.playAndRecord, mode: .default)
-            try audioSession.setActive(true)
-            let audioFilename = getDocumentsDirectory().appendingPathComponent(UUID().uuidString + ".m4a")
-            let settings = [
-                AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
-                AVSampleRateKey: 44100,
-                AVNumberOfChannelsKey: 2,
-                AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
-            ]
-            audioRecorder = try AVAudioRecorder(url: audioFilename, settings: settings)
-            audioRecorder?.record()
-            isRecordingAudio = true
-        } catch {
-            // Handle error
-        }
-    }
-    
-    private func stopRecording() {
-        audioRecorder?.stop()
-        isRecordingAudio = false
-        if let url = audioRecorder?.url {
-            let media = ChatMedia(type: .audio(url))
-            let message = ChatMessage(media: media, isIncoming: false)
-            messages.append(message)
-        }
-    }
-    
-    private func getDocumentsDirectory() -> URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     }
     
     private func startReceivingMessages() {
@@ -143,5 +165,15 @@ struct MessageView: View {
             let incomingMessage = ChatMessage(text: "example received message", isIncoming: true)
             messages.append(incomingMessage)
         }
+    }
+    
+    private func handleContactSelected(contact: CNContact) {
+        let message = ChatMessage(contact: contact, isIncoming: false)
+        messages.append(message)
+    }
+    
+    private func sendLocation(location: CLLocationCoordinate2D) {
+        let message = ChatMessage(location: location, isIncoming: false)
+        messages.append(message)
     }
 }

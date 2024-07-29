@@ -2,9 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSCameraUsageDescription</key>
-	<string>test</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>test</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Uygulama kullanımdayken konumunuza erişim izni gerekmektedir.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>Uygulama her zaman konumunuza erişim izni gerekmektedir.</string>
 </dict>
 </plist>

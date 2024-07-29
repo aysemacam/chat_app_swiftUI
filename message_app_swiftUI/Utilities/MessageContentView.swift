@@ -16,6 +16,20 @@ struct MessageContentView: View {
                 TextMessageView(text: text, isIncoming: message.isIncoming)
             } else if let media = message.media {
                 MediaMessageView(media: media, isIncoming: message.isIncoming)
+            } else if let contact = message.contact {
+                ContactMessageView(
+                    contact: contact,
+                    sendMessageAction: { print("Send Message") },
+                    saveContactAction: { print("Save Person") }
+                )
+                .frame(width: 270)
+                .frame(maxWidth: .infinity, alignment: message.isIncoming ? .leading : .trailing)
+                .padding(.horizontal)
+            } else if let location = message.location {
+                MapMessageView(location: location, isIncoming: message.isIncoming)
+                .frame(width: 270)
+                .frame(maxWidth: .infinity, alignment: message.isIncoming ? .leading : .trailing)
+                .padding(.horizontal)
             }
         }
     }
@@ -46,7 +60,6 @@ struct MediaMessageView: View {
     var body: some View {
         HStack {
             getMediaView()
-                .frame(width: 100, height: 150)
                 .cornerRadius(12)
                 .clipped()
                 .frame(maxWidth: .infinity, alignment: isIncoming ? .leading : .trailing)
@@ -61,13 +74,13 @@ struct MediaMessageView: View {
             Image(uiImage: image)
                 .resizable()
                 .aspectRatio(contentMode: .fill)
-                .frame(width: 140, height: 170)
+                .frame(width: 270, height: 360)
         case .video(let url):
             VideoPlayerView(url: url)
-                .frame(width: 140, height: 170)
+                .frame(width: 270, height: 360)
         case .audio(let url):
             AudioPlayerView(url: url)
-                .frame(maxWidth: 200, maxHeight: 50)
+                .frame(width: 270, height: 70)
         }
     }
 }

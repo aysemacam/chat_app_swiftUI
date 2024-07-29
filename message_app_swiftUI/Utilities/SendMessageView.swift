@@ -1,4 +1,3 @@
-
 //
 //  SendMessageView.swift
 //  message_app_swiftUI
@@ -14,6 +13,8 @@ struct SendMessageView: View {
     var plusButtonAction: () -> Void
     var cameraButtonAction: () -> Void
     var micButtonAction: () -> Void
+    
+    @State private var isPressed = false
     
     var body: some View {
         VStack {
@@ -41,8 +42,25 @@ struct SendMessageView: View {
                     Button(action: micButtonAction) {
                         Image(systemName: "mic")
                             .frame(width: 30, height: 30)
-                            .foregroundColor(.black)
+                            .foregroundColor(isPressed ? .red : .black)
                             .padding(.top)
+                            .simultaneousGesture(
+                                DragGesture(minimumDistance: 0)
+                                    .onChanged { _ in
+                                        if !isPressed {
+                                            isPressed = true
+                                            print("Mikrofona basılı tutmaya başlandı.")
+                                            micButtonAction()
+                                        }
+                                    }
+                                    .onEnded { _ in
+                                        if isPressed {
+                                            isPressed = false
+                                            print("Mikrofondan el çekildi.")
+                                            micButtonAction()
+                                        }
+                                    }
+                            )
                     }
                 } else {
                     Button(action: sendMessageAction) {

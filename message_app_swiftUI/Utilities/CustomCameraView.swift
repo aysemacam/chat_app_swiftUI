@@ -11,7 +11,7 @@ import AVFoundation
 struct CustomCameraView: View {
     @Binding var isPresented: Bool
     var didFinishPicking: (UIImage?, URL?) -> Void
-    @ObservedObject var cameraManager = CameraManager()
+    @StateObject var captureManager = CaptureManager()
     @State private var selectedMode: CameraMode = .photo
     @State private var videoDuration: Int = 0
     @State private var timer: Timer?
@@ -22,7 +22,7 @@ struct CustomCameraView: View {
     
     var body: some View {
         ZStack {
-            CameraPreview(cameraManager: cameraManager)
+            CameraPreview(captureManager: captureManager)
                 .edgesIgnoringSafeArea(.all)
             
             VStack {
@@ -46,9 +46,9 @@ struct CustomCameraView: View {
                     Spacer()
                     
                     Button(action: {
-                        cameraManager.toggleFlash()
+                        captureManager.toggleFlash()
                     }) {
-                        Image(systemName: cameraManager.isFlashOn ? "bolt.fill" : "bolt.slash.fill")
+                        Image(systemName: captureManager.isFlashOn ? "bolt.fill" : "bolt.slash.fill")
                             .resizable()
                             .frame(width: 25, height: 25)
                             .foregroundColor(.white)
@@ -58,17 +58,26 @@ struct CustomCameraView: View {
                 
                 Spacer()
                 
-                CaptureButton(selectedMode: $selectedMode, cameraManager: cameraManager, didFinishPicking: didFinishPicking, isPresented: $isPresented, videoDuration: $videoDuration, timer: $timer)
+                CaptureButton(selectedMode: $selectedMode, captureManager: captureManager, didFinishPicking: didFinishPicking, isPresented: $isPresented, videoDuration: $videoDuration, timer: $timer)
                     .padding(.bottom)
                 CollectionView(selectedMode: $selectedMode)
             }
         }
         .onAppear {
-            cameraManager.startSession()
+            captureManager.startSession()
         }
         .onDisappear {
-            cameraManager.stopSession()
+            captureManager.stopSession()
             timer?.invalidate()
+        }
+        .onChange(of: captureManager.isRecording) { isRecording in
+            if isRecording {
+                print("Recording started")
+            } else {
+                print("Recording stopped")
+                timer?.invalidate()
+                videoDuration = 0
+            }
         }
     }
     
@@ -77,6 +86,21 @@ struct CustomCameraView: View {
         let seconds = duration % 60
         return String(format: "%02d:%02d", minutes, seconds)
     }
+}
+
+struct CameraPreview: UIViewRepresentable {
+    @ObservedObject var captureManager: CaptureManager
+    
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView(frame: UIScreen.main.bounds)
+        if let previewLayer = captureManager.previewLayer {
+            previewLayer.frame = view.bounds
+            view.layer.addSublayer(previewLayer)
+        }
+        return view
+    }
+    
+    func updateUIView(_ uiView: UIView, context: Context) {}
 }
 
 struct CollectionView: View {
@@ -104,9 +128,10 @@ struct CollectionView: View {
     }
 }
 
+
 struct CaptureButton: View {
     @Binding var selectedMode: CustomCameraView.CameraMode
-    @ObservedObject var cameraManager: CameraManager
+    @ObservedObject var captureManager: CaptureManager
     var didFinishPicking: (UIImage?, URL?) -> Void
     @Binding var isPresented: Bool
     @Binding var videoDuration: Int
@@ -115,19 +140,21 @@ struct CaptureButton: View {
     var body: some View {
         Button(action: {
             if selectedMode == .photo {
-                cameraManager.takePhoto { image in
+                captureManager.takePhoto { image in
                     didFinishPicking(image, nil)
                     isPresented = false
                 }
             } else {
-                if cameraManager.videoOutput.isRecording {
-                    cameraManager.stopVideoRecording()
+                if captureManager.isRecording {
+                    captureManager.stopRecording()
                     timer?.invalidate()
                 } else {
-                    cameraManager.startVideoRecording { videoURL in
+                    captureManager.startRecording(durationProgressHandler: { duration in
+                        videoDuration = Int(duration)
+                    }, completion: { videoURL in
                         didFinishPicking(nil, videoURL)
                         isPresented = false
-                    }
+                    })
                     videoDuration = 0
                     timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
                         videoDuration += 1
@@ -140,7 +167,7 @@ struct CaptureButton: View {
                     .stroke(Color.white, lineWidth: 3)
                     .frame(width: 66, height: 66)
                 
-                if cameraManager.videoOutput.isRecording {
+                if captureManager.isRecording {
                     Rectangle()
                         .fill(Color.red)
                         .frame(width: 30, height: 30)
@@ -153,17 +180,4 @@ struct CaptureButton: View {
             }
         }
     }
-}
-
-struct CameraPreview: UIViewRepresentable {
-    @ObservedObject var cameraManager: CameraManager
-    
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView(frame: UIScreen.main.bounds)
-        cameraManager.previewLayer.frame = view.bounds
-        view.layer.addSublayer(cameraManager.previewLayer)
-        return view
-    }
-    
-    func updateUIView(_ uiView: UIView, context: Context) {}
 }

@@ -9,7 +9,14 @@
 /* Begin PBXBuildFile section */
 		56A2D3F72C5385C0004860E7 /* PopOverButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A2D3F62C5385C0004860E7 /* PopOverButtons.swift */; };
 		56A2D3F92C5397FE004860E7 /* CustomCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A2D3F82C5397FE004860E7 /* CustomCameraView.swift */; };
-		56A2D3FC2C5399D0004860E7 /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A2D3FB2C5399D0004860E7 /* CameraManager.swift */; };
+		56A2D3FC2C5399D0004860E7 /* CaptureManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A2D3FB2C5399D0004860E7 /* CaptureManager.swift */; };
+		56A2D3FE2C578440004860E7 /* VideoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A2D3FD2C578440004860E7 /* VideoPlayer.swift */; };
+		56A2D4002C579ED7004860E7 /* ContactMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A2D3FF2C579ED7004860E7 /* ContactMessageView.swift */; };
+		56A2D4022C57A641004860E7 /* ContactPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A2D4012C57A641004860E7 /* ContactPickerView.swift */; };
+		56A2D4042C57A750004860E7 /* MapMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A2D4032C57A750004860E7 /* MapMessageView.swift */; };
+		56A2D4062C57AA77004860E7 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A2D4052C57AA77004860E7 /* LocationManager.swift */; };
+		56A2D4082C57B2F6004860E7 /* MapPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A2D4072C57B2F6004860E7 /* MapPickerView.swift */; };
+		56A2D40A2C57C8A0004860E7 /* AudioRecorderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A2D4092C57C8A0004860E7 /* AudioRecorderManager.swift */; };
 		56BE74092C52586C0026695C /* message_app_swiftUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BE74082C52586C0026695C /* message_app_swiftUIApp.swift */; };
 		56BE740B2C52586C0026695C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BE740A2C52586C0026695C /* ContentView.swift */; };
 		56BE740D2C52586E0026695C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 56BE740C2C52586E0026695C /* Assets.xcassets */; };
@@ -30,7 +37,14 @@
 		56A2D3F62C5385C0004860E7 /* PopOverButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopOverButtons.swift; sourceTree = "<group>"; };
 		56A2D3F82C5397FE004860E7 /* CustomCameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCameraView.swift; sourceTree = "<group>"; };
 		56A2D3FA2C539911004860E7 /* message-app-swiftUI-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "message-app-swiftUI-Info.plist"; sourceTree = SOURCE_ROOT; };
-		56A2D3FB2C5399D0004860E7 /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
+		56A2D3FB2C5399D0004860E7 /* CaptureManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureManager.swift; sourceTree = "<group>"; };
+		56A2D3FD2C578440004860E7 /* VideoPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayer.swift; sourceTree = "<group>"; };
+		56A2D3FF2C579ED7004860E7 /* ContactMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactMessageView.swift; sourceTree = "<group>"; };
+		56A2D4012C57A641004860E7 /* ContactPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactPickerView.swift; sourceTree = "<group>"; };
+		56A2D4032C57A750004860E7 /* MapMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapMessageView.swift; sourceTree = "<group>"; };
+		56A2D4052C57AA77004860E7 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		56A2D4072C57B2F6004860E7 /* MapPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapPickerView.swift; sourceTree = "<group>"; };
+		56A2D4092C57C8A0004860E7 /* AudioRecorderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderManager.swift; sourceTree = "<group>"; };
 		56BE74052C52586C0026695C /* message_app_swiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = message_app_swiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		56BE74082C52586C0026695C /* message_app_swiftUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = message_app_swiftUIApp.swift; sourceTree = "<group>"; };
 		56BE740A2C52586C0026695C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -113,11 +127,15 @@
 				56BE741D2C525D280026695C /* MessageView.swift */,
 				56BE741F2C5263920026695C /* SendMessageView.swift */,
 				56BE74242C52A50E0026695C /* MessageContentView.swift */,
+				56A2D3F62C5385C0004860E7 /* PopOverButtons.swift */,
+				56BE742A2C52A56A0026695C /* AudioPlayerView.swift */,
 				56BE74262C52A52C0026695C /* ImagePicker.swift */,
 				56BE74282C52A54E0026695C /* VideoPlayerView.swift */,
-				56BE742A2C52A56A0026695C /* AudioPlayerView.swift */,
-				56A2D3F62C5385C0004860E7 /* PopOverButtons.swift */,
 				56A2D3F82C5397FE004860E7 /* CustomCameraView.swift */,
+				56A2D3FF2C579ED7004860E7 /* ContactMessageView.swift */,
+				56A2D4012C57A641004860E7 /* ContactPickerView.swift */,
+				56A2D4032C57A750004860E7 /* MapMessageView.swift */,
+				56A2D4072C57B2F6004860E7 /* MapPickerView.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -134,7 +152,10 @@
 			isa = PBXGroup;
 			children = (
 				56BE742D2C52A5990026695C /* KeyboardManager.swift */,
-				56A2D3FB2C5399D0004860E7 /* CameraManager.swift */,
+				56A2D3FB2C5399D0004860E7 /* CaptureManager.swift */,
+				56A2D3FD2C578440004860E7 /* VideoPlayer.swift */,
+				56A2D4052C57AA77004860E7 /* LocationManager.swift */,
+				56A2D4092C57C8A0004860E7 /* AudioRecorderManager.swift */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -223,12 +244,19 @@
 				56BE740B2C52586C0026695C /* ContentView.swift in Sources */,
 				56BE74292C52A54E0026695C /* VideoPlayerView.swift in Sources */,
 				56BE742E2C52A5990026695C /* KeyboardManager.swift in Sources */,
-				56A2D3FC2C5399D0004860E7 /* CameraManager.swift in Sources */,
+				56A2D4022C57A641004860E7 /* ContactPickerView.swift in Sources */,
+				56A2D4082C57B2F6004860E7 /* MapPickerView.swift in Sources */,
+				56A2D40A2C57C8A0004860E7 /* AudioRecorderManager.swift in Sources */,
+				56A2D3FC2C5399D0004860E7 /* CaptureManager.swift in Sources */,
 				56BE74272C52A52C0026695C /* ImagePicker.swift in Sources */,
 				56A2D3F72C5385C0004860E7 /* PopOverButtons.swift in Sources */,
+				56A2D3FE2C578440004860E7 /* VideoPlayer.swift in Sources */,
 				56A2D3F92C5397FE004860E7 /* CustomCameraView.swift in Sources */,
 				56BE74092C52586C0026695C /* message_app_swiftUIApp.swift in Sources */,
 				56BE74232C5272BD0026695C /* Color+Extensions.swift in Sources */,
+				56A2D4002C579ED7004860E7 /* ContactMessageView.swift in Sources */,
+				56A2D4062C57AA77004860E7 /* LocationManager.swift in Sources */,
+				56A2D4042C57A750004860E7 /* MapMessageView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -366,7 +394,10 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "message-app-swiftUI-Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = test;
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = test;
+				INFOPLIST_KEY_NSLocationUsageDescription = "we need your location.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = test;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -398,7 +429,10 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "message-app-swiftUI-Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = test;
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = test;
+				INFOPLIST_KEY_NSLocationUsageDescription = "we need your location.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = test;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

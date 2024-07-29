@@ -19,7 +19,7 @@ struct VideoPlayerView: View {
                 .frame(width: 50, height: 50)
                 .foregroundColor(.white)
         }
-        .frame(width: 200, height: 200)
+        .frame(width: 270, height: 360)
         .background(Color.black)
         .cornerRadius(12)
     }
