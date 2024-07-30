@@ -60,3 +60,15 @@ struct ChatMessage: Identifiable {
         self.isIncoming = isIncoming
     }
 }
+
+struct User: Identifiable {
+    let id = UUID()
+    let username: String
+    let userPhoto: UIImage
+    var userChat: UserChat
+}
+
+struct UserChat: Identifiable {
+    let id = UUID()
+    var messages: [ChatMessage]
+}

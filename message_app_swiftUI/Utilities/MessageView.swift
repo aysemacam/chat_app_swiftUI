@@ -30,6 +30,7 @@ struct MessageView: View {
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
+                MessageUserView()
                 ScrollView {
                     ForEach(messages) { message in
                         MessageContentView(message: message)
@@ -63,7 +64,9 @@ struct MessageView: View {
                         sendMessageAction: sendMessage,
                         plusButtonAction: { withAnimation { showButtonsView.toggle() } },
                         cameraButtonAction: { isShowingCameraView = true },
-                        micButtonAction: toggleRecording
+                        micButtonAction: { message in
+                            messages.append(message)
+                        }
                     )
                     .background(Color.gray)
                     .onAppear {
@@ -87,7 +90,6 @@ struct MessageView: View {
             .sheet(isPresented: $isShowingMapPicker) {
                 MapPickerView(isPresented: $isShowingMapPicker, selectedLocation: $selectedLocation)
             }
-           
             .onChange(of: selectedContact) { contact in
                 if let contact = contact {
                     handleContactSelected(contact: contact)
@@ -176,4 +178,7 @@ struct MessageView: View {
         let message = ChatMessage(location: location, isIncoming: false)
         messages.append(message)
     }
+}
+#Preview {
+    MessageView()
 }

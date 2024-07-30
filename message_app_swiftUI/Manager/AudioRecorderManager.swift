@@ -38,6 +38,12 @@ class AudioRecorderManager: ObservableObject {
         return audioRecorder?.url
     }
     
+    func cancelRecording() {
+        audioRecorder?.stop()
+        audioRecorder?.deleteRecording()
+        isRecording = false
+    }
+    
     private func getDocumentsDirectory() -> URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     }

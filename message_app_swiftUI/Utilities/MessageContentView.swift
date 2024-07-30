@@ -7,8 +7,11 @@
 
 import SwiftUI
 
+import SwiftUI
+
 struct MessageContentView: View {
     let message: ChatMessage
+    @State private var isFullScreenPresented = false
     
     var body: some View {
         HStack {
@@ -16,6 +19,12 @@ struct MessageContentView: View {
                 TextMessageView(text: text, isIncoming: message.isIncoming)
             } else if let media = message.media {
                 MediaMessageView(media: media, isIncoming: message.isIncoming)
+                    .onTapGesture {
+                        isFullScreenPresented = true
+                    }
+                    .fullScreenCover(isPresented: $isFullScreenPresented) {
+                        FullScreenMediaView(media: media, isPresented: $isFullScreenPresented)
+                    }
             } else if let contact = message.contact {
                 ContactMessageView(
                     contact: contact,
@@ -27,13 +36,15 @@ struct MessageContentView: View {
                 .padding(.horizontal)
             } else if let location = message.location {
                 MapMessageView(location: location, isIncoming: message.isIncoming)
-                .frame(width: 270)
-                .frame(maxWidth: .infinity, alignment: message.isIncoming ? .leading : .trailing)
-                .padding(.horizontal)
+                    .frame(width: 270)
+                    .frame(maxWidth: .infinity, alignment: message.isIncoming ? .leading : .trailing)
+                    .padding(.horizontal)
             }
         }
     }
 }
+
+
 
 struct TextMessageView: View {
     let text: String
@@ -75,12 +86,26 @@ struct MediaMessageView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 270, height: 360)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.teaGreen, lineWidth: 8)
+                )
         case .video(let url):
             VideoPlayerView(url: url)
                 .frame(width: 270, height: 360)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .aspectRatio(contentMode: .fill)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.teaGreen, lineWidth: 8)
+                )
         case .audio(let url):
             AudioPlayerView(url: url)
                 .frame(width: 270, height: 70)
+                .cornerRadius(12)
         }
     }
 }
+
+

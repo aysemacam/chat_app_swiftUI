@@ -24,7 +24,7 @@ public struct AudioPlayerView: View {
     public var body: some View {
         HStack {
             ZStack {
-                Image(systemName: "person.crop.circle.fill")
+                Image("nick")
                     .resizable()
                     .frame(width: 40, height: 40)
                     .foregroundColor(.gray)
@@ -32,9 +32,9 @@ public struct AudioPlayerView: View {
                     .clipShape(Circle())
                 Image(systemName: "mic.fill")
                     .resizable()
-                    .foregroundColor(.darkGray)
+                    .foregroundColor(.gray)
                     .frame(width: 10, height: 15)
-                    .position(x: 33, y: 33)
+                    .position(x: 35, y: 35)
             }
             .frame(width: 40, height: 40)
             
@@ -45,9 +45,6 @@ public struct AudioPlayerView: View {
                             player?.pause()
                             isPlaying = false
                         } else {
-                            player?.currentTime = 0
-                            progress = 0
-                            currentTime = 0
                             player?.play()
                             isPlaying = true
                         }
@@ -55,7 +52,7 @@ public struct AudioPlayerView: View {
                         Image(systemName: isPlaying ? "pause.fill" : "play.fill")
                             .resizable()
                             .frame(width: 15, height: 16)
-                            .foregroundColor(.darkGray)
+                            .foregroundColor(.gray)
                     }
                     
                     ProgressView(value: progress, total: playerDuration)
@@ -77,21 +74,23 @@ public struct AudioPlayerView: View {
             if player.isPlaying {
                 currentTime = player.currentTime
                 progress = currentTime
-            } else if !isPlaying && currentTime == 0 && player.duration > 0 {
-                currentTime = player.duration
+            } else if isPlaying && !player.isPlaying {
+                resetPlayer()
             }
         }
         .onAppear {
             do {
+                try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+                try AVAudioSession.sharedInstance().setActive(true)
+                
                 player = try AVAudioPlayer(contentsOf: url)
                 player?.delegate = AVAudioPlayerDelegateHandler(onFinish: {
-                    isPlaying = false
+                    resetPlayer()
                 })
                 player?.prepareToPlay()
-                currentTime = player?.duration ?? 0 // Başlangıçta toplam süreyi göster
-                progress = 0 // Progress 0'dan başlasın
+                currentTime = player?.duration ?? 0
+                progress = 0
             } catch {
-                // Handle error
                 print("Failed to initialize audio player: \(error.localizedDescription)")
             }
         }
@@ -105,6 +104,12 @@ public struct AudioPlayerView: View {
         let minutes = Int(time) / 60
         let seconds = Int(time) % 60
         return String(format: "%02d:%02d", minutes, seconds)
+    }
+    
+    private func resetPlayer() {
+        isPlaying = false
+        progress = 0
+        player?.currentTime = 0
     }
 }
 

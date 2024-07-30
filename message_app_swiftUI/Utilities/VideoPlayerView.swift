@@ -16,6 +16,7 @@ struct VideoPlayerView: View {
             VideoThumbnailView(url: url)
             Image(systemName: "play.circle.fill")
                 .resizable()
+            
                 .frame(width: 50, height: 50)
                 .foregroundColor(.white)
         }
@@ -32,7 +33,8 @@ struct VideoThumbnailView: View {
         if let thumbnailImage = generateThumbnail(url: url) {
             Image(uiImage: thumbnailImage)
                 .resizable()
-                .scaledToFit()
+                .aspectRatio(contentMode: .fill)
+    
         } else {
             Rectangle()
                 .foregroundColor(.gray)

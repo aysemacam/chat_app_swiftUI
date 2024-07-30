@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		565DC9472C58DED0003B0D9A /* RecordingOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565DC9462C58DED0003B0D9A /* RecordingOverlayView.swift */; };
+		565DC9492C58F07C003B0D9A /* FullScreenMediaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565DC9482C58F07C003B0D9A /* FullScreenMediaView.swift */; };
+		565DC94B2C5907B7003B0D9A /* MessageUserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565DC94A2C5907B7003B0D9A /* MessageUserView.swift */; };
 		56A2D3F72C5385C0004860E7 /* PopOverButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A2D3F62C5385C0004860E7 /* PopOverButtons.swift */; };
 		56A2D3F92C5397FE004860E7 /* CustomCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A2D3F82C5397FE004860E7 /* CustomCameraView.swift */; };
 		56A2D3FC2C5399D0004860E7 /* CaptureManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A2D3FB2C5399D0004860E7 /* CaptureManager.swift */; };
@@ -34,6 +37,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		565DC9462C58DED0003B0D9A /* RecordingOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingOverlayView.swift; sourceTree = "<group>"; };
+		565DC9482C58F07C003B0D9A /* FullScreenMediaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullScreenMediaView.swift; sourceTree = "<group>"; };
+		565DC94A2C5907B7003B0D9A /* MessageUserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageUserView.swift; sourceTree = "<group>"; };
 		56A2D3F62C5385C0004860E7 /* PopOverButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopOverButtons.swift; sourceTree = "<group>"; };
 		56A2D3F82C5397FE004860E7 /* CustomCameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCameraView.swift; sourceTree = "<group>"; };
 		56A2D3FA2C539911004860E7 /* message-app-swiftUI-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "message-app-swiftUI-Info.plist"; sourceTree = SOURCE_ROOT; };
@@ -136,6 +142,9 @@
 				56A2D4012C57A641004860E7 /* ContactPickerView.swift */,
 				56A2D4032C57A750004860E7 /* MapMessageView.swift */,
 				56A2D4072C57B2F6004860E7 /* MapPickerView.swift */,
+				565DC9462C58DED0003B0D9A /* RecordingOverlayView.swift */,
+				565DC9482C58F07C003B0D9A /* FullScreenMediaView.swift */,
+				565DC94A2C5907B7003B0D9A /* MessageUserView.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -245,16 +254,19 @@
 				56BE74292C52A54E0026695C /* VideoPlayerView.swift in Sources */,
 				56BE742E2C52A5990026695C /* KeyboardManager.swift in Sources */,
 				56A2D4022C57A641004860E7 /* ContactPickerView.swift in Sources */,
+				565DC9492C58F07C003B0D9A /* FullScreenMediaView.swift in Sources */,
 				56A2D4082C57B2F6004860E7 /* MapPickerView.swift in Sources */,
 				56A2D40A2C57C8A0004860E7 /* AudioRecorderManager.swift in Sources */,
 				56A2D3FC2C5399D0004860E7 /* CaptureManager.swift in Sources */,
 				56BE74272C52A52C0026695C /* ImagePicker.swift in Sources */,
 				56A2D3F72C5385C0004860E7 /* PopOverButtons.swift in Sources */,
+				565DC94B2C5907B7003B0D9A /* MessageUserView.swift in Sources */,
 				56A2D3FE2C578440004860E7 /* VideoPlayer.swift in Sources */,
 				56A2D3F92C5397FE004860E7 /* CustomCameraView.swift in Sources */,
 				56BE74092C52586C0026695C /* message_app_swiftUIApp.swift in Sources */,
 				56BE74232C5272BD0026695C /* Color+Extensions.swift in Sources */,
 				56A2D4002C579ED7004860E7 /* ContactMessageView.swift in Sources */,
+				565DC9472C58DED0003B0D9A /* RecordingOverlayView.swift in Sources */,
 				56A2D4062C57AA77004860E7 /* LocationManager.swift in Sources */,
 				56A2D4042C57A750004860E7 /* MapMessageView.swift in Sources */,
 			);
