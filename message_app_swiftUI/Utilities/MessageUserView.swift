@@ -8,10 +8,14 @@
 import SwiftUI
 
 struct MessageUserView: View {
+    var user: User
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    
     var body: some View {
         VStack(spacing: 0) {
             HStack {
                 Button(action: {
+                    self.presentationMode.wrappedValue.dismiss()
                 }) {
                     Image(systemName: "chevron.backward")
                         .foregroundColor(.black)
@@ -21,14 +25,16 @@ struct MessageUserView: View {
                 Text("6")
                     .font(.system(size: 16, weight: .regular))
 
-                Image("nick")
-                    .resizable()
-                    .foregroundColor(.gray)
-                    .frame(width: 35, height: 35)
-                    .clipShape(Circle())
-                    .padding(.leading, 12)
+                if let uiImage = UIImage(data: user.userPhoto) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .foregroundColor(.gray)
+                        .frame(width: 35, height: 35)
+                        .clipShape(Circle())
+                        .padding(.leading, 12)
+                }
 
-                Text("Nick Cave")
+                Text(user.username)
                     .font(.system(size: 16, weight: .regular))
                     .padding(.leading, 8)
 
@@ -49,18 +55,12 @@ struct MessageUserView: View {
                 .padding(.trailing, 8)
             }
             .padding(.horizontal)
-            .padding(.bottom ,12)
+            .padding(.bottom, 12)
             .background(Color.white)
             
             Rectangle()
-                .fill(Color.black)
+                .fill(Color.gray)
                 .frame(height: 0.4)
         }
-    }
-}
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        MessageUserView()
     }
 }

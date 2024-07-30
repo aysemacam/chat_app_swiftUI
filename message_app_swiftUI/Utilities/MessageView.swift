@@ -13,7 +13,7 @@ import Combine
 import CoreLocation
 
 struct MessageView: View {
-    @State private var messages: [ChatMessage] = []
+    @State var user: User
     @State private var lastMessage: String = ""
     @State private var isShowingImagePicker = false
     @State private var isShowingCameraView = false
@@ -26,17 +26,30 @@ struct MessageView: View {
     @State private var isShowingMapPicker = false
     @State private var selectedLocation: CLLocationCoordinate2D?
     @StateObject private var audioRecorderManager = AudioRecorderManager()
+    @State private var scrollViewProxy: ScrollViewProxy?
 
     var body: some View {
         ZStack {
+     
             VStack(spacing: 0) {
-                MessageUserView()
-                ScrollView {
-                    ForEach(messages) { message in
-                        MessageContentView(message: message)
-                            .padding(.vertical, 2)
+                MessageUserView(user: user)
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        ForEach(user.userChat?.messages ?? []) { message in
+                            MessageContentView(message: message)
+                                .padding(.vertical, 2)
+                                .id(message.id)
+                        }
+                    }
+                    .onAppear {
+                        scrollViewProxy = proxy
+                        scrollToBottom(proxy: proxy)
+                    }
+                    .onChange(of: user.userChat?.messages.count) { _ in
+                        scrollToBottom(proxy: proxy)
                     }
                 }
+
                 VStack {
                     if showButtonsView {
                         VStack {
@@ -49,11 +62,11 @@ struct MessageView: View {
                                     }
                                 )
                                 .frame(width: 110, height: 120)
-                                .background(Color.white.opacity(0.5))
-                                .cornerRadius(10)
-                                .shadow(radius: 1)
+                                .background(Color.clear.opacity(0.5))
+                            
                                 Spacer()
                             }
+                            .background(Color.clear)
                             .padding(.leading)
                         }
                         .background(Color.clear)
@@ -65,29 +78,30 @@ struct MessageView: View {
                         plusButtonAction: { withAnimation { showButtonsView.toggle() } },
                         cameraButtonAction: { isShowingCameraView = true },
                         micButtonAction: { message in
-                            messages.append(message)
+                            addMessage(message)
                         }
                     )
-                    .background(Color.gray)
                     .onAppear {
+                        loadUserMessages()
                         startReceivingMessages()
                         locationManager.requestLocationPermission()
                     }
                 }
             }
             .background(Color.lightGray)
-            .sheet(isPresented: $isShowingImagePicker) {
+            .padding(.top, 15)
+            .sheet(isPresented: $isShowingImagePicker, onDismiss: { showButtonsView = false }) {
                 ImagePicker { image, videoURL in
                     handleImagePicked(image: image, videoURL: videoURL)
                 }
             }
-            .fullScreenCover(isPresented: $isShowingCameraView) {
+            .fullScreenCover(isPresented: $isShowingCameraView, onDismiss: { showButtonsView = false }) {
                 CustomCameraView(isPresented: $isShowingCameraView, didFinishPicking: handleImagePicked)
             }
-            .sheet(isPresented: $isShowingContactPicker) {
+            .sheet(isPresented: $isShowingContactPicker, onDismiss: { showButtonsView = false }) {
                 ContactPickerView(isPresented: $isShowingContactPicker, selectedContact: $selectedContact)
             }
-            .sheet(isPresented: $isShowingMapPicker) {
+            .sheet(isPresented: $isShowingMapPicker, onDismiss: { showButtonsView = false }) {
                 MapPickerView(isPresented: $isShowingMapPicker, selectedLocation: $selectedLocation)
             }
             .onChange(of: selectedContact) { contact in
@@ -98,6 +112,7 @@ struct MessageView: View {
         }
         .onReceive(locationManager.$userLocation) { newLocation in
             if let newLocation = newLocation {
+                // location found
             } else {
                 print("Cannot find location info.")
             }
@@ -121,23 +136,32 @@ struct MessageView: View {
                 sendLocation(location: location)
             }
         }
+        .navigationBarHidden(true)
+    }
+
+    private func scrollToBottom(proxy: ScrollViewProxy) {
+        if let lastMessage = user.userChat?.messages.last {
+            withAnimation {
+                proxy.scrollTo(lastMessage.id, anchor: .bottom)
+            }
+        }
     }
     
     private func sendMessage() {
         let message = ChatMessage(text: lastMessage, isIncoming: false)
-        messages.append(message)
+        addMessage(message)
         lastMessage = ""
     }
     
     private func handleImagePicked(image: UIImage?, videoURL: URL?) {
         if let image = image {
-            let media = ChatMedia(type: .photo(image))
+            let media = ChatMedia(type: .photo(image.pngData()!))
             let message = ChatMessage(media: media, isIncoming: false)
-            messages.append(message)
+            addMessage(message)
         } else if let videoURL = videoURL {
             let media = ChatMedia(type: .video(videoURL))
             let message = ChatMessage(media: media, isIncoming: false)
-            messages.append(message)
+            addMessage(message)
         }
     }
 
@@ -155,7 +179,7 @@ struct MessageView: View {
                 print("Recorded audio file: \(url)")
                 let media = ChatMedia(type: .audio(url))
                 let message = ChatMessage(media: media, isIncoming: false)
-                messages.append(message)
+                addMessage(message)
             }
         } else {
             audioRecorderManager.startRecording()
@@ -163,22 +187,40 @@ struct MessageView: View {
     }
     
     private func startReceivingMessages() {
-        Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { _ in
-            let incomingMessage = ChatMessage(text: "example received message", isIncoming: true)
-            messages.append(incomingMessage)
-        }
+//        Timer.scheduledTimer(withTimeInterval: 20, repeats: true) { _ in
+//            let incomingMessage = ChatMessage(text: "example received message", isIncoming: true)
+//            addMessage(incomingMessage)
+//        }
     }
     
     private func handleContactSelected(contact: CNContact) {
         let message = ChatMessage(contact: contact, isIncoming: false)
-        messages.append(message)
+        addMessage(message)
     }
     
     private func sendLocation(location: CLLocationCoordinate2D) {
         let message = ChatMessage(location: location, isIncoming: false)
-        messages.append(message)
+        addMessage(message)
     }
-}
-#Preview {
-    MessageView()
+
+    private func addMessage(_ message: ChatMessage) {
+        if user.userChat == nil {
+            user.userChat = UserChat(messages: [])
+        }
+        user.userChat?.messages.append(message)
+        print("Added message: \(message.text ?? "Media Message")")
+        DataManager.shared.saveUserChat(for: user)
+        if let proxy = scrollViewProxy {
+            scrollToBottom(proxy: proxy)
+        }
+    }
+
+    private func loadUserMessages() {
+        if let savedUser = DataManager.shared.fetchUser(byID: user.id) {
+            user.userChat = savedUser.userChat
+            print("Loaded messages for user: \(user.username)")
+        } else {
+            print("No messages found for user: \(user.username)")
+        }
+    }
 }

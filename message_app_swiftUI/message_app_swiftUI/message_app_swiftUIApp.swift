@@ -11,7 +11,7 @@ import SwiftUI
 struct message_app_swiftUIApp: App {
     var body: some Scene {
         WindowGroup {
-            MessageView()
+            ContentView()
         }
     }
 }

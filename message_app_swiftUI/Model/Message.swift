@@ -9,22 +9,65 @@ import UIKit
 import Contacts
 import CoreLocation
 
-enum MediaType {
-    case photo(UIImage)
+enum MediaType: Codable {
+    case photo(Data)
     case video(URL)
     case audio(URL)
+    
+    enum CodingKeys: String, CodingKey {
+        case type, data
+    }
+    
+    enum MediaTypeCodingError: Error {
+        case decoding(String)
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let type = try container.decode(String.self, forKey: .type)
+        
+        switch type {
+        case "photo":
+            let data = try container.decode(Data.self, forKey: .data)
+            self = .photo(data)
+        case "video":
+            let url = try container.decode(URL.self, forKey: .data)
+            self = .video(url)
+        case "audio":
+            let url = try container.decode(URL.self, forKey: .data)
+            self = .audio(url)
+        default:
+            throw MediaTypeCodingError.decoding("Unknown type")
+        }
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        switch self {
+        case .photo(let data):
+            try container.encode("photo", forKey: .type)
+            try container.encode(data, forKey: .data)
+        case .video(let url):
+            try container.encode("video", forKey: .type)
+            try container.encode(url, forKey: .data)
+        case .audio(let url):
+            try container.encode("audio", forKey: .type)
+            try container.encode(url, forKey: .data)
+        }
+    }
 }
 
-struct ChatMedia: Identifiable {
+struct ChatMedia: Identifiable, Codable {
     let id = UUID()
     let type: MediaType
 }
 
-struct ChatMessage: Identifiable {
+struct ChatMessage: Identifiable, Codable {
     let id = UUID()
     let text: String?
     let media: ChatMedia?
-    let contact: CNContact?
+    let contact: Data?
     let location: CLLocationCoordinate2D?
     let isIncoming: Bool
     
@@ -47,7 +90,7 @@ struct ChatMessage: Identifiable {
     init(contact: CNContact, isIncoming: Bool) {
         self.text = nil
         self.media = nil
-        self.contact = contact
+        self.contact = try? CNContactVCardSerialization.data(with: [contact])
         self.location = nil
         self.isIncoming = isIncoming
     }
@@ -61,14 +104,44 @@ struct ChatMessage: Identifiable {
     }
 }
 
-struct User: Identifiable {
-    let id = UUID()
+struct User: Identifiable, Codable {
+    let id: UUID
     let username: String
-    let userPhoto: UIImage
-    var userChat: UserChat
+    let userPhoto: Data
+    var userChat: UserChat?
+
+    init(username: String, userPhoto: Data, userChat: UserChat? = nil) {
+        self.id = UUID()
+        self.username = username
+        self.userPhoto = userPhoto
+        self.userChat = userChat
+    }
 }
 
-struct UserChat: Identifiable {
+struct UserChat: Identifiable, Codable {
     let id = UUID()
     var messages: [ChatMessage]
+}
+
+import Foundation
+import CoreLocation
+
+extension CLLocationCoordinate2D: Codable {
+    enum CodingKeys: String, CodingKey {
+        case latitude
+        case longitude
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let latitude = try container.decode(CLLocationDegrees.self, forKey: .latitude)
+        let longitude = try container.decode(CLLocationDegrees.self, forKey: .longitude)
+        self.init(latitude: latitude, longitude: longitude)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(latitude, forKey: .latitude)
+        try container.encode(longitude, forKey: .longitude)
+    }
 }

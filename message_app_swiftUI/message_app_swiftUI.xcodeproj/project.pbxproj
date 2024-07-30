@@ -10,6 +10,7 @@
 		565DC9472C58DED0003B0D9A /* RecordingOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565DC9462C58DED0003B0D9A /* RecordingOverlayView.swift */; };
 		565DC9492C58F07C003B0D9A /* FullScreenMediaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565DC9482C58F07C003B0D9A /* FullScreenMediaView.swift */; };
 		565DC94B2C5907B7003B0D9A /* MessageUserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565DC94A2C5907B7003B0D9A /* MessageUserView.swift */; };
+		565DC9502C592E56003B0D9A /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565DC94F2C592E56003B0D9A /* DataManager.swift */; };
 		56A2D3F72C5385C0004860E7 /* PopOverButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A2D3F62C5385C0004860E7 /* PopOverButtons.swift */; };
 		56A2D3F92C5397FE004860E7 /* CustomCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A2D3F82C5397FE004860E7 /* CustomCameraView.swift */; };
 		56A2D3FC2C5399D0004860E7 /* CaptureManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A2D3FB2C5399D0004860E7 /* CaptureManager.swift */; };
@@ -40,6 +41,7 @@
 		565DC9462C58DED0003B0D9A /* RecordingOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingOverlayView.swift; sourceTree = "<group>"; };
 		565DC9482C58F07C003B0D9A /* FullScreenMediaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullScreenMediaView.swift; sourceTree = "<group>"; };
 		565DC94A2C5907B7003B0D9A /* MessageUserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageUserView.swift; sourceTree = "<group>"; };
+		565DC94F2C592E56003B0D9A /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
 		56A2D3F62C5385C0004860E7 /* PopOverButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopOverButtons.swift; sourceTree = "<group>"; };
 		56A2D3F82C5397FE004860E7 /* CustomCameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCameraView.swift; sourceTree = "<group>"; };
 		56A2D3FA2C539911004860E7 /* message-app-swiftUI-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "message-app-swiftUI-Info.plist"; sourceTree = SOURCE_ROOT; };
@@ -165,6 +167,7 @@
 				56A2D3FD2C578440004860E7 /* VideoPlayer.swift */,
 				56A2D4052C57AA77004860E7 /* LocationManager.swift */,
 				56A2D4092C57C8A0004860E7 /* AudioRecorderManager.swift */,
+				565DC94F2C592E56003B0D9A /* DataManager.swift */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -266,6 +269,7 @@
 				56BE74092C52586C0026695C /* message_app_swiftUIApp.swift in Sources */,
 				56BE74232C5272BD0026695C /* Color+Extensions.swift in Sources */,
 				56A2D4002C579ED7004860E7 /* ContactMessageView.swift in Sources */,
+				565DC9502C592E56003B0D9A /* DataManager.swift in Sources */,
 				565DC9472C58DED0003B0D9A /* RecordingOverlayView.swift in Sources */,
 				56A2D4062C57AA77004860E7 /* LocationManager.swift in Sources */,
 				56A2D4042C57A750004860E7 /* MapMessageView.swift in Sources */,

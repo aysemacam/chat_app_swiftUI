@@ -63,7 +63,7 @@ struct FullScreenMediaView: View {
                         }) {
                             Image(systemName: "square.and.arrow.up")
                         }
-                        .padding(.top)
+                        .padding(.vertical)
                         .frame(width: UIScreen.main.bounds.width / 4)
                       
                         Button(action: {
@@ -71,7 +71,7 @@ struct FullScreenMediaView: View {
                         }) {
                             Image(systemName: "scribble")
                         }
-                        .padding(.top)
+                        .padding(.vertical)
                         .frame(width: UIScreen.main.bounds.width / 4)
                         
                         Button(action: {
@@ -79,7 +79,7 @@ struct FullScreenMediaView: View {
                         }) {
                             Image(systemName: "star")
                         }
-                        .padding(.top)
+                        .padding(.vertical)
                         .frame(width: UIScreen.main.bounds.width / 4)
                   
                         Button(action: {
@@ -87,7 +87,7 @@ struct FullScreenMediaView: View {
                         }) {
                             Image(systemName: "trash")
                         }
-                        .padding(.top)
+                        .padding(.vertical)
                         .frame(width: UIScreen.main.bounds.width / 4)
                     }
                     .frame(width: UIScreen.main.bounds.width)
@@ -110,14 +110,19 @@ struct FullScreenMediaView: View {
     @ViewBuilder
     private func getMediaView() -> some View {
         switch media.type {
-        case .photo(let image):
-            Image(uiImage: image)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .clipped()
+        case .photo(let imageData):
+            if let image = UIImage(data: imageData) {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .clipped()
+            } else {
+                Text("Invalid Image Data")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
         case .video(let url):
-          SimpleVideoPlayerView(videoURL: url)
+            SimpleVideoPlayerView(videoURL: url, controlsVisible: $controlsVisible)
             
         case .audio:
             Text("Audio content is not supported for full screen view.")
@@ -125,12 +130,9 @@ struct FullScreenMediaView: View {
         }
     }
 }
-//
-//  SimpleVideoPlayerView.swift
-//  video_player_app_SwiftUI
-//
-//  Created by Aysema Çam on 30.07.2024.
-//
+
+
+
 
 import SwiftUI
 import AVKit
@@ -138,57 +140,79 @@ import AVKit
 struct SimpleVideoPlayerView: View {
     let videoURL: URL
     @State private var player: AVPlayer
-    @State private var isPlaying: Bool = true
-    @State private var showControls: Bool = false
+    @State private var isPlaying = false
+    @State private var playbackPosition: Double = 0.0
+    @Binding var controlsVisible: Bool
 
-    init(videoURL: URL) {
+    init(videoURL: URL, controlsVisible: Binding<Bool>) {
         self.videoURL = videoURL
         self._player = State(initialValue: AVPlayer(url: videoURL))
+        self._controlsVisible = controlsVisible
     }
 
     var body: some View {
         GeometryReader { geometry in
             ZStack {
                 CustomVideoPlayer(player: player)
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .ignoresSafeArea()
                     .onAppear {
                         player.play()
+                        isPlaying = true
+                        addPeriodicTimeObserver()
+                        addPlayerEndObserver()
                     }
                     .onDisappear {
                         player.pause()
                     }
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-                    .ignoresSafeArea()
 
-                if showControls {
+                if controlsVisible {
                     VStack {
                         Spacer()
                         HStack {
                             Spacer()
-                            Button(action: {
-                                withAnimation {
-                                    showControls.toggle()
-                                }
-                            }) {
-                                Image(systemName: "xmark")
-                                    .foregroundColor(.white)
-                                    .padding()
-                                    .background(Circle().fill(Color.black.opacity(0.7)))
-                            }
-                            .padding(.trailing)
+                            PlayPauseButton(isPlaying: $isPlaying, player: player)
+                                .frame(width: 50, height: 50)
+                                .background(Color.clear)
+                                .clipShape(Circle())
+                                .padding()
+                            Spacer()
                         }
-                        .padding(.bottom)
+                        Spacer()
+                        ProgressView(value: playbackPosition)
+                            .progressViewStyle(LinearProgressViewStyle(tint: .white))
+                            .padding()
+                            .background(Color.clear)
+                            .padding(.bottom, 70)
+                            .cornerRadius(10)
                     }
-                    .transition(.opacity)
-                }
-            }
-            .onTapGesture {
-                withAnimation {
-                    showControls.toggle()
                 }
             }
         }
         .background(Color.black)
         .ignoresSafeArea()
+        .onTapGesture {
+            withAnimation {
+                controlsVisible.toggle()
+            }
+        }
+    }
+
+    private func addPeriodicTimeObserver() {
+        let interval = CMTime(seconds: 0.03, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+        player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { time in
+            if let currentItem = player.currentItem {
+                playbackPosition = currentItem.currentTime().seconds / currentItem.duration.seconds
+            }
+        }
+    }
+
+    private func addPlayerEndObserver() {
+        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: player.currentItem, queue: .main) { _ in
+            player.seek(to: .zero)
+            playbackPosition = 0.0
+            isPlaying = false
+        }
     }
 }
 
@@ -198,10 +222,36 @@ struct CustomVideoPlayer: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> AVPlayerViewController {
         let controller = AVPlayerViewController()
         controller.player = player
-        controller.showsPlaybackControls = true
+        controller.showsPlaybackControls = false
         controller.videoGravity = .resizeAspect
         return controller
     }
 
     func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {}
+}
+
+struct PlayPauseButton: View {
+    @Binding var isPlaying: Bool
+    var player: AVPlayer
+
+    var body: some View {
+        Button(action: {
+            if isPlaying {
+                player.pause()
+            } else {
+                player.play()
+            }
+            isPlaying.toggle()
+        }) {
+            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                .foregroundColor(.white)
+                .font(.largeTitle)
+        }
+    }
+}
+
+struct SimpleVideoPlayerView_Previews: PreviewProvider {
+    static var previews: some View {
+        SimpleVideoPlayerView(videoURL: URL(string: "https://www.example.com/video.mp4")!, controlsVisible: .constant(true))
+    }
 }
