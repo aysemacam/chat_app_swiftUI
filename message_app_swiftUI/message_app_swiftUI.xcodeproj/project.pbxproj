@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		563BEAF92C5A387E0003690F /* ContactPickerViewForCreateChat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 563BEAF82C5A387E0003690F /* ContactPickerViewForCreateChat.swift */; };
+		563BEAFB2C5A3C550003690F /* SelectionHeaderFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 563BEAFA2C5A3C550003690F /* SelectionHeaderFooterView.swift */; };
 		565DC9472C58DED0003B0D9A /* RecordingOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565DC9462C58DED0003B0D9A /* RecordingOverlayView.swift */; };
 		565DC9492C58F07C003B0D9A /* FullScreenMediaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565DC9482C58F07C003B0D9A /* FullScreenMediaView.swift */; };
 		565DC94B2C5907B7003B0D9A /* MessageUserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565DC94A2C5907B7003B0D9A /* MessageUserView.swift */; };
@@ -38,6 +40,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		563BEAF82C5A387E0003690F /* ContactPickerViewForCreateChat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactPickerViewForCreateChat.swift; sourceTree = "<group>"; };
+		563BEAFA2C5A3C550003690F /* SelectionHeaderFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionHeaderFooterView.swift; sourceTree = "<group>"; };
 		565DC9462C58DED0003B0D9A /* RecordingOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingOverlayView.swift; sourceTree = "<group>"; };
 		565DC9482C58F07C003B0D9A /* FullScreenMediaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullScreenMediaView.swift; sourceTree = "<group>"; };
 		565DC94A2C5907B7003B0D9A /* MessageUserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageUserView.swift; sourceTree = "<group>"; };
@@ -147,6 +151,8 @@
 				565DC9462C58DED0003B0D9A /* RecordingOverlayView.swift */,
 				565DC9482C58F07C003B0D9A /* FullScreenMediaView.swift */,
 				565DC94A2C5907B7003B0D9A /* MessageUserView.swift */,
+				563BEAF82C5A387E0003690F /* ContactPickerViewForCreateChat.swift */,
+				563BEAFA2C5A3C550003690F /* SelectionHeaderFooterView.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -253,12 +259,14 @@
 				56BE741E2C525D280026695C /* MessageView.swift in Sources */,
 				56BE741B2C525C090026695C /* Message.swift in Sources */,
 				56BE742B2C52A56A0026695C /* AudioPlayerView.swift in Sources */,
+				563BEAFB2C5A3C550003690F /* SelectionHeaderFooterView.swift in Sources */,
 				56BE740B2C52586C0026695C /* ContentView.swift in Sources */,
 				56BE74292C52A54E0026695C /* VideoPlayerView.swift in Sources */,
 				56BE742E2C52A5990026695C /* KeyboardManager.swift in Sources */,
 				56A2D4022C57A641004860E7 /* ContactPickerView.swift in Sources */,
 				565DC9492C58F07C003B0D9A /* FullScreenMediaView.swift in Sources */,
 				56A2D4082C57B2F6004860E7 /* MapPickerView.swift in Sources */,
+				563BEAF92C5A387E0003690F /* ContactPickerViewForCreateChat.swift in Sources */,
 				56A2D40A2C57C8A0004860E7 /* AudioRecorderManager.swift in Sources */,
 				56A2D3FC2C5399D0004860E7 /* CaptureManager.swift in Sources */,
 				56BE74272C52A52C0026695C /* ImagePicker.swift in Sources */,

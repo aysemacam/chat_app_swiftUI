@@ -71,6 +71,7 @@ struct ContentView: View {
                         users.append(newUser)
                         DataManager.shared.saveUsers(users)
                         self.selectedUser = newUser
+                        NotificationCenter.default.post(name: NSNotification.Name("UserSaved"), object: nil)
                     }
                     self.isNavigationActive = true
                 }
@@ -85,6 +86,9 @@ struct ContentView: View {
                 ]
                 DataManager.shared.saveUsers(users)
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("UserSaved"))) { _ in
+            self.users = DataManager.shared.fetchUsers()
         }
     }
     
@@ -120,41 +124,3 @@ let dateFormatter: DateFormatter = {
     formatter.timeStyle = .short
     return formatter
 }()
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
-}
-
-struct ContactPickerViewForCreateChat: UIViewControllerRepresentable {
-    var completionHandler: (CNContact?) -> Void
-    
-    func makeCoordinator() -> Coordinator {
-        return Coordinator(completionHandler: completionHandler)
-    }
-    
-    func makeUIViewController(context: Context) -> some UIViewController {
-        let picker = CNContactPickerViewController()
-        picker.delegate = context.coordinator
-        return picker
-    }
-    
-    func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {}
-    
-    class Coordinator: NSObject, CNContactPickerDelegate {
-        var completionHandler: (CNContact?) -> Void
-        
-        init(completionHandler: @escaping (CNContact?) -> Void) {
-            self.completionHandler = completionHandler
-        }
-        
-        func contactPicker(_ picker: CNContactPickerViewController, didSelect contact: CNContact) {
-            completionHandler(contact)
-        }
-        
-        func contactPickerDidCancel(_ picker: CNContactPickerViewController) {
-            completionHandler(nil)
-        }
-    }
-}

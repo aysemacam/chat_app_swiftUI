@@ -250,8 +250,3 @@ struct PlayPauseButton: View {
     }
 }
 
-struct SimpleVideoPlayerView_Previews: PreviewProvider {
-    static var previews: some View {
-        SimpleVideoPlayerView(videoURL: URL(string: "https://www.example.com/video.mp4")!, controlsVisible: .constant(true))
-    }
-}

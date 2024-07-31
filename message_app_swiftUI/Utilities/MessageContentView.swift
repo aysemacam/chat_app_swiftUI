@@ -11,45 +11,78 @@ import Contacts
 
 struct MessageContentView: View {
     let message: ChatMessage
+    var isSelected: Bool
+    var toggleSelection: () -> Void
     @State private var isFullScreenPresented = false
-    
+    @Binding var isSelectionMode: Bool
+
     var body: some View {
         HStack {
-            if let text = message.text {
-                TextMessageView(text: text, isIncoming: message.isIncoming)
-            } else if let media = message.media {
-                MediaMessageView(media: media, isIncoming: message.isIncoming)
-                    .onTapGesture {
+            if isSelected {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundColor(.green)
+                    .padding(.leading)
+            }
+            
+            content
+                .background(.clear)
+                .onTapGesture {
+                    if isSelectionMode {
+                        toggleSelection()
+                    }
+                }
+                .onLongPressGesture {
+                    isSelectionMode = true
+                    toggleSelection()
+                }
+        }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        if let text = message.text {
+            TextMessageView(text: text, isIncoming: message.isIncoming)
+        } else if let media = message.media {
+            MediaMessageView(media: media, isIncoming: message.isIncoming)
+                .onTapGesture {
+                    if isSelectionMode == true {
+                        toggleSelection()
+                    } else {
                         if case .photo = media.type {
                             isFullScreenPresented = true
                         } else if case .video = media.type {
                             isFullScreenPresented = true
                         }
                     }
-                    .fullScreenCover(isPresented: $isFullScreenPresented) {
-                        FullScreenMediaView(media: media, isPresented: $isFullScreenPresented)
+                  
+                }
+                .fullScreenCover(isPresented: $isFullScreenPresented) {
+                    FullScreenMediaView(media: media, isPresented: $isFullScreenPresented)
+                }
+        } else if let contactData = message.contact, let contact = try? CNContactVCardSerialization.contacts(with: contactData).first {
+            ContactMessageView(
+                contact: contact
+              
+            )
+            .frame(width: 270)
+            .frame(maxWidth: .infinity, alignment: message.isIncoming ? .leading : .trailing)
+            .padding(.horizontal)
+        } else if let location = message.location {
+            MapMessageView(location: location, isIncoming: message.isIncoming)
+                .onTapGesture {
+                    if isSelectionMode == true {
+                        toggleSelection()
+                    } else {
+                        isFullScreenPresented = true
                     }
-            } else if let contactData = message.contact, let contact = try? CNContactVCardSerialization.contacts(with: contactData).first {
-                ContactMessageView(
-                    contact: contact,
-                    sendMessageAction: { print("Send Message") },
-                    saveContactAction: { print("Save Person") }
-                )
+                   
+                }
+                .fullScreenCover(isPresented: $isFullScreenPresented) {
+                    FullScreenMapView(location: location, isPresented: $isFullScreenPresented)
+                }
                 .frame(width: 270)
                 .frame(maxWidth: .infinity, alignment: message.isIncoming ? .leading : .trailing)
                 .padding(.horizontal)
-            } else if let location = message.location {
-                MapMessageView(location: location, isIncoming: message.isIncoming)
-                    .onTapGesture {
-                        isFullScreenPresented = true
-                    }
-                    .fullScreenCover(isPresented: $isFullScreenPresented) {
-                        FullScreenMapView(location: location, isPresented: $isFullScreenPresented)
-                    }
-                    .frame(width: 270)
-                    .frame(maxWidth: .infinity, alignment: message.isIncoming ? .leading : .trailing)
-                    .padding(.horizontal)
-            }
         }
     }
 }

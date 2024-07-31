@@ -5,14 +5,17 @@
 //  Created by Aysema Çam on 26.07.2024.
 //
 
-import SwiftUI
 import Contacts
+import ContactsUI
+import SwiftUI
 
 struct ContactMessageView: View {
     let contact: CNContact
-    var sendMessageAction: () -> Void
-    var saveContactAction: () -> Void
-    
+    @State private var isShowingContactEditor = false
+    @State private var isNavigatingToMessageView = false
+    @State private var selectedUser: User?
+    @State private var navigationTrigger = false
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -31,7 +34,7 @@ struct ContactMessageView: View {
                         .clipShape(Circle())
                         .shadow(radius: 1)
                 }
-                
+
                 VStack(alignment: .leading) {
                     Text(CNContactFormatter.string(from: contact, style: .fullName) ?? "No Name")
                         .font(.headline)
@@ -40,12 +43,33 @@ struct ContactMessageView: View {
                         .foregroundColor(.gray)
                 }
             }
-            
+
             Divider()
 
-            
             HStack(spacing: 0) {
-                Button(action: sendMessageAction) {
+                NavigationLink(destination: MessageView(user: selectedUser ?? User(username: "", userPhoto: Data())), isActive: $isNavigatingToMessageView) {
+                    EmptyView()
+                }
+                
+                Button(action: {
+                    let contactUsername = CNContactFormatter.string(from: contact, style: .fullName) ?? "No Name"
+                    var users = DataManager.shared.fetchUsers()
+                    
+                    if let existingUser = users.first(where: { $0.username == contactUsername }) {
+                        self.selectedUser = existingUser
+                    } else {
+                        let newUser = User(
+                            username: contactUsername,
+                            userPhoto: UIImage(systemName: "person.crop.circle")!.jpegData(compressionQuality: 1.0)!
+                        )
+                        users.append(newUser)
+                        DataManager.shared.saveUsers(users)
+                        self.selectedUser = newUser
+                        NotificationCenter.default.post(name: NSNotification.Name("UserSaved"), object: nil)
+                    }
+                    self.isNavigatingToMessageView = true
+                    self.navigationTrigger.toggle()
+                }) {
                     Text("Message")
                         .font(.subheadline)
                         .foregroundColor(.darkGreen)
@@ -54,10 +78,12 @@ struct ContactMessageView: View {
                         .background(Color.clear)
                         .cornerRadius(8)
                 }
-                
-               Divider()
-                
-                Button(action: saveContactAction) {
+
+                Divider()
+
+                Button(action: {
+                    isShowingContactEditor = true
+                }) {
                     Text("Save Person")
                         .font(.subheadline)
                         .foregroundColor(.darkGreen)
@@ -66,6 +92,9 @@ struct ContactMessageView: View {
                         .background(Color.clear)
                         .cornerRadius(8)
                 }
+                .sheet(isPresented: $isShowingContactEditor) {
+                    ContactEditorView(contact: contact, isPresented: $isShowingContactEditor)
+                }
             }
         }
         .padding()
@@ -73,4 +102,46 @@ struct ContactMessageView: View {
         .cornerRadius(12)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
+}
+
+struct ContactEditorView: UIViewControllerRepresentable {
+    let contact: CNContact
+    @Binding var isPresented: Bool
+
+    class Coordinator: NSObject, CNContactViewControllerDelegate {
+        var parent: ContactEditorView
+
+        init(parent: ContactEditorView) {
+            self.parent = parent
+        }
+
+        func contactViewController(_ viewController: CNContactViewController, didCompleteWith contact: CNContact?) {
+            parent.isPresented = false
+        }
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(parent: self)
+    }
+
+    func makeUIViewController(context: Context) -> UINavigationController {
+        let newContact = CNMutableContact()
+        newContact.givenName = contact.givenName
+        newContact.familyName = contact.familyName
+        if let phoneNumber = contact.phoneNumbers.first?.value {
+            newContact.phoneNumbers = [CNLabeledValue(label: CNLabelPhoneNumberMobile, value: phoneNumber)]
+        }
+        if let imageData = contact.thumbnailImageData {
+            newContact.imageData = imageData
+        }
+
+        let contactViewController = CNContactViewController(forNewContact: newContact)
+        contactViewController.contactStore = CNContactStore()
+        contactViewController.delegate = context.coordinator
+
+        let navigationController = UINavigationController(rootViewController: contactViewController)
+        return navigationController
+    }
+
+    func updateUIViewController(_ uiViewController: UINavigationController, context: Context) {}
 }

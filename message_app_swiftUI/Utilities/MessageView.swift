@@ -27,66 +27,38 @@ struct MessageView: View {
     @State private var selectedLocation: CLLocationCoordinate2D?
     @StateObject private var audioRecorderManager = AudioRecorderManager()
     @State private var scrollViewProxy: ScrollViewProxy?
+    @State private var selectedMessages: Set<UUID> = []
+    @State private var isSelectionMode: Bool = false
 
     var body: some View {
         ZStack {
      
             VStack(spacing: 0) {
-                MessageUserView(user: user)
-                ScrollViewReader { proxy in
-                    ScrollView {
-                        ForEach(user.userChat?.messages ?? []) { message in
-                            MessageContentView(message: message)
-                                .padding(.vertical, 2)
-                                .id(message.id)
-                        }
-                    }
-                    .onAppear {
-                        scrollViewProxy = proxy
-                        scrollToBottom(proxy: proxy)
-                    }
-                    .onChange(of: user.userChat?.messages.count) { _ in
-                        scrollToBottom(proxy: proxy)
-                    }
-                }
-
-                VStack {
-                    if showButtonsView {
-                        VStack {
-                            HStack {
-                                PopOverButtons(
-                                    galleryAction: showGallery,
-                                    contactAction: showContactPicker,
-                                    sendLocationAction: { _ in
-                                        isShowingMapPicker = true
-                                    }
-                                )
-                                .frame(width: 110, height: 120)
-                                .background(Color.clear.opacity(0.5))
-                            
-                                Spacer()
-                            }
-                            .background(Color.clear)
-                            .padding(.leading)
+                
+                headerView
+                messagesScrollView
+                if showButtonsView {
+                    VStack {
+                        HStack {
+                            PopOverButtons(
+                                galleryAction: showGallery,
+                                contactAction: showContactPicker,
+                                sendLocationAction: { _ in
+                                    isShowingMapPicker = true
+                                }
+                            )
+                            .frame(width: 110, height: 120)
+                            .background(Color.clear.opacity(0.5))
+                        
+                            Spacer()
                         }
                         .background(Color.clear)
-                        .edgesIgnoringSafeArea(.all)
+                        .padding(.leading)
                     }
-                    SendMessageView(
-                        lastMessage: $lastMessage,
-                        sendMessageAction: sendMessage,
-                        plusButtonAction: { withAnimation { showButtonsView.toggle() } },
-                        cameraButtonAction: { isShowingCameraView = true },
-                        micButtonAction: { message in
-                            addMessage(message)
-                        }
-                    )
-                    .onAppear {
-                        loadUserMessages()
-                        startReceivingMessages()
-                        locationManager.requestLocationPermission()
-                    }
+                    .background(Color.clear)
+                    .edgesIgnoringSafeArea(.all)
                 }
+                footerView
             }
             .background(Color.lightGray)
             .padding(.top, 15)
@@ -139,6 +111,95 @@ struct MessageView: View {
         .navigationBarHidden(true)
     }
 
+    private var headerView: some View {
+        Group {
+            if isSelectionMode {
+                SelectionHeaderView(user: user, cancelAction: cancelSelection)
+                    .frame(height: 70)
+            } else {
+                MessageUserView(user: user)
+            }
+        }
+    }
+
+    private var messagesScrollView: some View {
+        ScrollViewReader { proxy in
+            ScrollView {
+                
+                ForEach(user.userChat?.messages ?? []) { message in
+                    
+                    MessageContentView(
+                        message: message,
+                        isSelected: selectedMessages.contains(message.id),
+                        toggleSelection: { toggleMessageSelection(message) },
+                        isSelectionMode: $isSelectionMode
+                    )
+                    .padding(.vertical, 2)
+                    .id(message.id)
+                }
+            }
+            .onAppear {
+                print(user.userChat?.messages, "mmmmmm")
+                scrollViewProxy = proxy
+                scrollToBottom(proxy: proxy)
+            }
+            .onChange(of: user.userChat?.messages.count) { _ in
+                scrollToBottom(proxy: proxy)
+            }
+        }
+    }
+
+    private var footerView: some View {
+        Group {
+            if isSelectionMode {
+                SelectionFooterView(
+                    selectedCount: selectedMessages.count,
+                    deleteAction: deleteSelectedMessages
+                )
+            } else {
+                SendMessageView(
+                    lastMessage: $lastMessage,
+                    sendMessageAction: sendMessage,
+                    plusButtonAction: { withAnimation { showButtonsView.toggle() } },
+                    cameraButtonAction: { isShowingCameraView = true },
+                    micButtonAction: { message in
+                        addMessage(message)
+                    }
+                )
+                .onAppear {
+                    loadUserMessages()
+                    startReceivingMessages()
+                    locationManager.requestLocationPermission()
+                }
+            }
+        }
+    }
+
+    // Toggle message selection
+    private func toggleMessageSelection(_ message: ChatMessage) {
+        if selectedMessages.contains(message.id) {
+            selectedMessages.remove(message.id)
+        } else {
+            selectedMessages.insert(message.id)
+        }
+        isSelectionMode = !selectedMessages.isEmpty
+    }
+
+    // Delete selected messages
+    private func deleteSelectedMessages() {
+        user.userChat?.messages.removeAll { selectedMessages.contains($0.id) }
+        selectedMessages.removeAll()
+        isSelectionMode = false
+        DataManager.shared.saveUserChat(for: user)
+    }
+
+    // Cancel selection mode
+    private func cancelSelection() {
+        selectedMessages.removeAll()
+        isSelectionMode = false
+    }
+
+    // Scroll to bottom of messages
     private func scrollToBottom(proxy: ScrollViewProxy) {
         if let lastMessage = user.userChat?.messages.last {
             withAnimation {
@@ -147,12 +208,14 @@ struct MessageView: View {
         }
     }
     
+    // Send a message
     private func sendMessage() {
         let message = ChatMessage(text: lastMessage, isIncoming: false)
         addMessage(message)
         lastMessage = ""
     }
     
+    // Handle image picked from gallery or camera
     private func handleImagePicked(image: UIImage?, videoURL: URL?) {
         if let image = image {
             let media = ChatMedia(type: .photo(image.pngData()!))
@@ -187,10 +250,11 @@ struct MessageView: View {
     }
     
     private func startReceivingMessages() {
-//        Timer.scheduledTimer(withTimeInterval: 20, repeats: true) { _ in
-//            let incomingMessage = ChatMessage(text: "example received message", isIncoming: true)
-//            addMessage(incomingMessage)
-//        }
+        // Uncomment and use to simulate receiving messages periodically
+        // Timer.scheduledTimer(withTimeInterval: 20, repeats: true) { _ in
+        //     let incomingMessage = ChatMessage(text: "example received message", isIncoming: true)
+        //     addMessage(incomingMessage)
+        // }
     }
     
     private func handleContactSelected(contact: CNContact) {
@@ -224,3 +288,4 @@ struct MessageView: View {
         }
     }
 }
+
