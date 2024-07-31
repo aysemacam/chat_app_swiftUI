@@ -121,9 +121,13 @@ struct SendMessageView: View {
         } else {
             if let url = audioRecorderManager.stopRecording() {
                 print("Kayıt durduruldu.")
-                let media = ChatMedia(type: .audio(url))
-                let message = ChatMessage(media: media, isIncoming: false)
-                micButtonAction(message)
+                if let audioData = try? Data(contentsOf: url) {
+                    let media = ChatMedia(type: .audio(audioData))
+                    let message = ChatMessage(media: media, isIncoming: false)
+                    micButtonAction(message)
+                } else {
+                    print("Audio data conversion failed.")
+                }
             }
         }
     }

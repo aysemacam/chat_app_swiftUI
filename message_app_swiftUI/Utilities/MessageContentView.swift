@@ -45,37 +45,28 @@ struct MessageContentView: View {
         } else if let media = message.media {
             MediaMessageView(media: media, isIncoming: message.isIncoming)
                 .onTapGesture {
-                    if isSelectionMode == true {
+                    if isSelectionMode {
                         toggleSelection()
                     } else {
-                        if case .photo = media.type {
-                            isFullScreenPresented = true
-                        } else if case .video = media.type {
-                            isFullScreenPresented = true
-                        }
+                        isFullScreenPresented = true
                     }
-                  
                 }
                 .fullScreenCover(isPresented: $isFullScreenPresented) {
                     FullScreenMediaView(media: media, isPresented: $isFullScreenPresented)
                 }
         } else if let contactData = message.contact, let contact = try? CNContactVCardSerialization.contacts(with: contactData).first {
-            ContactMessageView(
-                contact: contact
-              
-            )
-            .frame(width: 270)
-            .frame(maxWidth: .infinity, alignment: message.isIncoming ? .leading : .trailing)
-            .padding(.horizontal)
+            ContactMessageView(contact: contact)
+                .frame(width: 270)
+                .frame(maxWidth: .infinity, alignment: message.isIncoming ? .leading : .trailing)
+                .padding(.horizontal)
         } else if let location = message.location {
             MapMessageView(location: location, isIncoming: message.isIncoming)
                 .onTapGesture {
-                    if isSelectionMode == true {
+                    if isSelectionMode {
                         toggleSelection()
                     } else {
                         isFullScreenPresented = true
                     }
-                   
                 }
                 .fullScreenCover(isPresented: $isFullScreenPresented) {
                     FullScreenMapView(location: location, isPresented: $isFullScreenPresented)
@@ -160,7 +151,7 @@ struct MediaMessageView: View {
                     )
             }
         case .video(let url):
-            VideoPlayerView(url: url)
+            VideoPlayerView(videoData: url)
                 .frame(width: 270, height: 360)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .aspectRatio(contentMode: .fill)
@@ -169,7 +160,7 @@ struct MediaMessageView: View {
                         .stroke(Color.teaGreen, lineWidth: 8)
                 )
         case .audio(let url):
-            AudioPlayerView(url: url)
+            AudioPlayerView(audioData: url)
                 .frame(width: 270, height: 70)
                 .cornerRadius(12)
         }

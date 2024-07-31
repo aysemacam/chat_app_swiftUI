@@ -9,20 +9,34 @@ import SwiftUI
 import AVKit
 
 struct VideoPlayerView: View {
-    let url: URL
+    let videoData: Data
     
     var body: some View {
-        ZStack {
+        if let url = saveDataToTemporaryFile(data: videoData, fileName: "tempVideo.mp4") {
             VideoThumbnailView(url: url)
-            Image(systemName: "play.circle.fill")
-                .resizable()
-            
-                .frame(width: 50, height: 50)
+                .frame(width: 270, height: 360)
+                .background(Color.black)
+                .cornerRadius(12)
+        } else {
+            Text("Unable to load video")
                 .foregroundColor(.white)
+                .frame(width: 270, height: 360)
+                .background(Color.black)
+                .cornerRadius(12)
         }
-        .frame(width: 270, height: 360)
-        .background(Color.black)
-        .cornerRadius(12)
+    }
+    
+    private func saveDataToTemporaryFile(data: Data, fileName: String) -> URL? {
+        let tempDirectory = FileManager.default.temporaryDirectory
+        let fileURL = tempDirectory.appendingPathComponent(fileName)
+        
+        do {
+            try data.write(to: fileURL)
+            return fileURL
+        } catch {
+            print("Failed to save video data to temporary file: \(error.localizedDescription)")
+            return nil
+        }
     }
 }
 
@@ -30,14 +44,22 @@ struct VideoThumbnailView: View {
     let url: URL
     
     var body: some View {
-        if let thumbnailImage = generateThumbnail(url: url) {
-            Image(uiImage: thumbnailImage)
+        ZStack {
+            if let thumbnailImage = generateThumbnail(url: url) {
+                Image(uiImage: thumbnailImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 270, height: 360)
+                    .clipped()
+            } else {
+                Rectangle()
+                    .foregroundColor(.gray)
+                    .frame(width: 270, height: 360)
+            }
+            Image(systemName: "play.circle.fill")
                 .resizable()
-                .aspectRatio(contentMode: .fill)
-    
-        } else {
-            Rectangle()
-                .foregroundColor(.gray)
+                .frame(width: 50, height: 50)
+                .foregroundColor(.white)
         }
     }
     

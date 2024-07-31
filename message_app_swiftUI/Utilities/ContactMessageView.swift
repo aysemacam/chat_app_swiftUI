@@ -67,8 +67,11 @@ struct ContactMessageView: View {
                         self.selectedUser = newUser
                         NotificationCenter.default.post(name: NSNotification.Name("UserSaved"), object: nil)
                     }
-                    self.isNavigatingToMessageView = true
-                    self.navigationTrigger.toggle()
+                    
+                    self.isNavigatingToMessageView = false
+                    DispatchQueue.main.async {
+                        self.isNavigatingToMessageView = true
+                    }
                 }) {
                     Text("Message")
                         .font(.subheadline)

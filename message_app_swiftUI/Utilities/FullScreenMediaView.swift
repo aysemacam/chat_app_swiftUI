@@ -97,9 +97,11 @@ struct FullScreenMediaView: View {
             }
         }
         .onAppear {
-            if case .video(let url) = media.type {
-                player = AVPlayer(url: url)
-                player?.play()
+            if case .video(let videoData) = media.type {
+                if let url = saveDataToTemporaryFile(data: videoData, fileName: "tempVideo.mp4") {
+                    player = AVPlayer(url: url)
+                    player?.play()
+                }
             }
         }
         .onDisappear {
@@ -121,16 +123,29 @@ struct FullScreenMediaView: View {
                 Text("Invalid Image Data")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-        case .video(let url):
-            SimpleVideoPlayerView(videoURL: url, controlsVisible: $controlsVisible)
-            
+        case .video(let videoData):
+            if let url = saveDataToTemporaryFile(data: videoData, fileName: "tempVideo.mp4") {
+                SimpleVideoPlayerView(videoURL: url, controlsVisible: $controlsVisible)
+            }
         case .audio:
             Text("Audio content is not supported for full screen view.")
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
+    
+    private func saveDataToTemporaryFile(data: Data, fileName: String) -> URL? {
+        let tempDirectory = FileManager.default.temporaryDirectory
+        let fileURL = tempDirectory.appendingPathComponent(fileName)
+        
+        do {
+            try data.write(to: fileURL)
+            return fileURL
+        } catch {
+            print("Failed to save video data to temporary file: \(error.localizedDescription)")
+            return nil
+        }
+    }
 }
-
 
 
 

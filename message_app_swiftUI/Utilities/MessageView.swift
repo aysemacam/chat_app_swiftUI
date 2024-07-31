@@ -32,9 +32,7 @@ struct MessageView: View {
 
     var body: some View {
         ZStack {
-     
             VStack(spacing: 0) {
-                
                 headerView
                 messagesScrollView
                 if showButtonsView {
@@ -49,7 +47,6 @@ struct MessageView: View {
                             )
                             .frame(width: 110, height: 120)
                             .background(Color.clear.opacity(0.5))
-                        
                             Spacer()
                         }
                         .background(Color.clear)
@@ -115,9 +112,10 @@ struct MessageView: View {
         Group {
             if isSelectionMode {
                 SelectionHeaderView(user: user, cancelAction: cancelSelection)
-                    .frame(height: 70)
             } else {
                 MessageUserView(user: user)
+                    
+
             }
         }
     }
@@ -125,9 +123,7 @@ struct MessageView: View {
     private var messagesScrollView: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                
                 ForEach(user.userChat?.messages ?? []) { message in
-                    
                     MessageContentView(
                         message: message,
                         isSelected: selectedMessages.contains(message.id),
@@ -175,7 +171,6 @@ struct MessageView: View {
         }
     }
 
-    // Toggle message selection
     private func toggleMessageSelection(_ message: ChatMessage) {
         if selectedMessages.contains(message.id) {
             selectedMessages.remove(message.id)
@@ -185,7 +180,6 @@ struct MessageView: View {
         isSelectionMode = !selectedMessages.isEmpty
     }
 
-    // Delete selected messages
     private func deleteSelectedMessages() {
         user.userChat?.messages.removeAll { selectedMessages.contains($0.id) }
         selectedMessages.removeAll()
@@ -193,13 +187,11 @@ struct MessageView: View {
         DataManager.shared.saveUserChat(for: user)
     }
 
-    // Cancel selection mode
     private func cancelSelection() {
         selectedMessages.removeAll()
         isSelectionMode = false
     }
 
-    // Scroll to bottom of messages
     private func scrollToBottom(proxy: ScrollViewProxy) {
         if let lastMessage = user.userChat?.messages.last {
             withAnimation {
@@ -207,22 +199,20 @@ struct MessageView: View {
             }
         }
     }
-    
-    // Send a message
+
     private func sendMessage() {
         let message = ChatMessage(text: lastMessage, isIncoming: false)
         addMessage(message)
         lastMessage = ""
     }
-    
-    // Handle image picked from gallery or camera
+
     private func handleImagePicked(image: UIImage?, videoURL: URL?) {
         if let image = image {
             let media = ChatMedia(type: .photo(image.pngData()!))
             let message = ChatMessage(media: media, isIncoming: false)
             addMessage(message)
-        } else if let videoURL = videoURL {
-            let media = ChatMedia(type: .video(videoURL))
+        } else if let videoURL = videoURL, let videoData = try? Data(contentsOf: videoURL) {
+            let media = ChatMedia(type: .video(videoData))
             let message = ChatMessage(media: media, isIncoming: false)
             addMessage(message)
         }
@@ -231,16 +221,16 @@ struct MessageView: View {
     private func showGallery() {
         isShowingImagePicker = true
     }
-    
+
     private func showContactPicker() {
         isShowingContactPicker = true
     }
-    
+
     private func toggleRecording() {
         if audioRecorderManager.isRecording {
-            if let url = audioRecorderManager.stopRecording() {
+            if let url = audioRecorderManager.stopRecording(), let audioData = try? Data(contentsOf: url) {
                 print("Recorded audio file: \(url)")
-                let media = ChatMedia(type: .audio(url))
+                let media = ChatMedia(type: .audio(audioData))
                 let message = ChatMessage(media: media, isIncoming: false)
                 addMessage(message)
             }
@@ -248,7 +238,7 @@ struct MessageView: View {
             audioRecorderManager.startRecording()
         }
     }
-    
+
     private func startReceivingMessages() {
         // Uncomment and use to simulate receiving messages periodically
         // Timer.scheduledTimer(withTimeInterval: 20, repeats: true) { _ in
@@ -256,12 +246,12 @@ struct MessageView: View {
         //     addMessage(incomingMessage)
         // }
     }
-    
+
     private func handleContactSelected(contact: CNContact) {
         let message = ChatMessage(contact: contact, isIncoming: false)
         addMessage(message)
     }
-    
+
     private func sendLocation(location: CLLocationCoordinate2D) {
         let message = ChatMessage(location: location, isIncoming: false)
         addMessage(message)
@@ -288,4 +278,3 @@ struct MessageView: View {
         }
     }
 }
-

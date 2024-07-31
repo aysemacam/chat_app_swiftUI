@@ -9,10 +9,13 @@ import UIKit
 import Contacts
 import CoreLocation
 
+import Foundation
+import UIKit
+
 enum MediaType: Codable {
     case photo(Data)
-    case video(URL)
-    case audio(URL)
+    case video(Data)
+    case audio(Data)
     
     enum CodingKeys: String, CodingKey {
         case type, data
@@ -31,11 +34,11 @@ enum MediaType: Codable {
             let data = try container.decode(Data.self, forKey: .data)
             self = .photo(data)
         case "video":
-            let url = try container.decode(URL.self, forKey: .data)
-            self = .video(url)
+            let data = try container.decode(Data.self, forKey: .data)
+            self = .video(data)
         case "audio":
-            let url = try container.decode(URL.self, forKey: .data)
-            self = .audio(url)
+            let data = try container.decode(Data.self, forKey: .data)
+            self = .audio(data)
         default:
             throw MediaTypeCodingError.decoding("Unknown type")
         }
@@ -48,12 +51,12 @@ enum MediaType: Codable {
         case .photo(let data):
             try container.encode("photo", forKey: .type)
             try container.encode(data, forKey: .data)
-        case .video(let url):
+        case .video(let data):
             try container.encode("video", forKey: .type)
-            try container.encode(url, forKey: .data)
-        case .audio(let url):
+            try container.encode(data, forKey: .data)
+        case .audio(let data):
             try container.encode("audio", forKey: .type)
-            try container.encode(url, forKey: .data)
+            try container.encode(data, forKey: .data)
         }
     }
 }

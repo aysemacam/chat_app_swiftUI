@@ -6,6 +6,13 @@
 //
 
 import SwiftUI
+import FirebaseCore
+import FirebaseFirestore
+import FirebaseSessions
+import FirebaseStorage
+
+
+
 
 @main
 struct message_app_swiftUIApp: App {

@@ -10,15 +10,15 @@ import AVFoundation
 import Combine
 
 public struct AudioPlayerView: View {
-    let url: URL
+    let audioData: Data
     @State private var player: AVAudioPlayer?
     @State private var isPlaying = false
     @State private var currentTime: Double = 0.0
     @State private var progress: Double = 0.0
     private var timer = Timer.publish(every: 0.01, on: .main, in: .common).autoconnect().eraseToAnyPublisher()
 
-    public init(url: URL) {
-        self.url = url
+    public init(audioData: Data) {
+        self.audioData = audioData
     }
 
     public var body: some View {
@@ -83,7 +83,7 @@ public struct AudioPlayerView: View {
                 try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
                 try AVAudioSession.sharedInstance().setActive(true)
                 
-                player = try AVAudioPlayer(contentsOf: url)
+                player = try AVAudioPlayer(data: audioData)
                 player?.delegate = AVAudioPlayerDelegateHandler(onFinish: {
                     resetPlayer()
                 })

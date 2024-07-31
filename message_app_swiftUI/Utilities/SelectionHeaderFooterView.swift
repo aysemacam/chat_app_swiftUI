@@ -7,24 +7,59 @@
 
 import SwiftUI
 
+
+
 struct SelectionHeaderView: View {
     var user: User
     var cancelAction: () -> Void
 
-    var body: some View {
-        HStack {
-            Image(systemName: "person.crop.circle")
-                .resizable()
-                .frame(width: 40, height: 40)
-            Text(user.username)
-            Spacer()
-            Button(action: cancelAction) {
-                Text("Cancel")
+
+        var body: some View {
+            VStack(spacing: 0) {
+                HStack {
+                    Button(action: {
+                       
+                    }) {
+                        Image(systemName: "chevron.backward")
+                            .foregroundColor(.black)
+                    }
+                    .padding(.leading, 8)
+
+                    Text("6")
+                        .font(.system(size: 16, weight: .regular))
+
+                    if let uiImage = UIImage(data: user.userPhoto) {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .foregroundColor(.gray)
+                            .frame(width: 35, height: 35)
+                            .clipShape(Circle())
+                            .padding(.leading, 12)
+                    }
+
+                    Text(user.username)
+                        .font(.system(size: 16, weight: .regular))
+                        .padding(.leading, 8)
+
+                    Spacer()
+
+                    Button(action: cancelAction) {
+                        Text("Cancel")
+                    }
+                    .padding(.trailing, 8)
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 12)
+                .background(Color.white)
+                
+                Rectangle()
+                    .fill(Color.gray)
+                    .frame(height: 0.4)
             }
         }
-        .padding()
-        .background(Color.white)
-    }
+        
+    
+    
 }
 
 struct SelectionFooterView: View {
