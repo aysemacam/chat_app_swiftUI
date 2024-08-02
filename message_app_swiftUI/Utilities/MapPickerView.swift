@@ -7,9 +7,6 @@
 import SwiftUI
 import MapKit
 
-import SwiftUI
-import MapKit
-
 struct MapPickerView: View {
     @Binding var isPresented: Bool
     @Binding var selectedLocation: CLLocationCoordinate2D?
@@ -53,10 +50,12 @@ struct MapPickerView: View {
                 }
             }
             .onChange(of: region.center) { newCenter in
-                temporaryLocation = IdentifiableCoordinate(coordinate: newCenter)
+                if let tempLocation = temporaryLocation, tempLocation.coordinate != newCenter {
+                    temporaryLocation = IdentifiableCoordinate(coordinate: newCenter)
+                }
             }
             .onReceive(locationManager.$userLocation) { userLocation in
-                if let userLocation = userLocation, selectedLocation == nil {
+                if let userLocation = userLocation, selectedLocation == nil, temporaryLocation == nil {
                     region.center = userLocation
                     temporaryLocation = IdentifiableCoordinate(coordinate: userLocation)
                 }

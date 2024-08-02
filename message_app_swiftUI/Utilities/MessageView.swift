@@ -35,26 +35,6 @@ struct MessageView: View {
             VStack(spacing: 0) {
                 headerView
                 messagesScrollView
-                if showButtonsView {
-                    VStack {
-                        HStack {
-                            PopOverButtons(
-                                galleryAction: showGallery,
-                                contactAction: showContactPicker,
-                                sendLocationAction: { _ in
-                                    isShowingMapPicker = true
-                                }
-                            )
-                            .frame(width: 110, height: 120)
-                            .background(Color.clear.opacity(0.5))
-                            Spacer()
-                        }
-                        .background(Color.clear)
-                        .padding(.leading)
-                    }
-                    .background(Color.clear)
-                    .edgesIgnoringSafeArea(.all)
-                }
                 footerView
             }
             .background(Color.lightGray)
@@ -77,6 +57,31 @@ struct MessageView: View {
                 if let contact = contact {
                     handleContactSelected(contact: contact)
                 }
+            }
+
+            if showButtonsView {
+                VStack {
+                    Spacer()
+                    HStack {
+                        PopOverButtons(
+                            galleryAction: showGallery,
+                            contactAction: showContactPicker,
+                            sendLocationAction: { _ in
+                                isShowingMapPicker = true
+                            }
+                        )
+                        .frame(width: 110, height: 120)
+                        .background(Color.clear.opacity(0.5))
+                        Spacer()
+                    }
+                    .background(Color.clear)
+                    .padding(.leading)
+                }
+                .background(Color.clear)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+                .offset(y: -keyboardManager.keyboardHeight - 80)
+//                .transition(.move(edge: .bottom))
+                .edgesIgnoringSafeArea(.all)
             }
         }
         .onReceive(locationManager.$userLocation) { newLocation in
@@ -106,6 +111,10 @@ struct MessageView: View {
             }
         }
         .navigationBarHidden(true)
+        .contentShape(Rectangle()) // To detect taps outside the keyboard
+        .onTapGesture {
+            self.hideKeyboard()
+        }
     }
 
     private var headerView: some View {
@@ -114,8 +123,6 @@ struct MessageView: View {
                 SelectionHeaderView(user: user, cancelAction: cancelSelection)
             } else {
                 MessageUserView(user: user)
-                    
-
             }
         }
     }
@@ -276,5 +283,9 @@ struct MessageView: View {
         } else {
             print("No messages found for user: \(user.username)")
         }
+    }
+    
+    private func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }

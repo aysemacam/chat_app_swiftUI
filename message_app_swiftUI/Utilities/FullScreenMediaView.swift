@@ -114,11 +114,8 @@ struct FullScreenMediaView: View {
         switch media.type {
         case .photo(let imageData):
             if let image = UIImage(data: imageData) {
-                Image(uiImage: image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .clipped()
+                ZoomableImageView(image: image)
+                    .edgesIgnoringSafeArea(.all)
             } else {
                 Text("Invalid Image Data")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -146,6 +143,56 @@ struct FullScreenMediaView: View {
         }
     }
 }
+
+import SwiftUI
+import UIKit
+
+struct ZoomableImageView: UIViewRepresentable {
+    var image: UIImage
+    
+    func makeUIView(context: Context) -> UIScrollView {
+        let scrollView = UIScrollView()
+        scrollView.delegate = context.coordinator
+        scrollView.minimumZoomScale = 1.0
+        scrollView.maximumZoomScale = 6.0
+        
+        let imageView = UIImageView(image: image)
+        imageView.contentMode = .scaleAspectFit
+        imageView.isUserInteractionEnabled = true
+        scrollView.addSubview(imageView)
+        
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
+        imageView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
+        imageView.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
+        imageView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
+        imageView.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
+        imageView.heightAnchor.constraint(equalTo: scrollView.heightAnchor).isActive = true
+        
+        return scrollView
+    }
+    
+    func updateUIView(_ uiView: UIScrollView, context: Context) {
+        // No update needed
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject, UIScrollViewDelegate {
+        var parent: ZoomableImageView
+        
+        init(_ parent: ZoomableImageView) {
+            self.parent = parent
+        }
+        
+        func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+            return scrollView.subviews.first
+        }
+    }
+}
+
 
 
 

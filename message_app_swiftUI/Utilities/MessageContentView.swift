@@ -48,7 +48,11 @@ struct MessageContentView: View {
                     if isSelectionMode {
                         toggleSelection()
                     } else {
-                        isFullScreenPresented = true
+                                          if case .audio = media.type {
+                                          } else {
+                                              isFullScreenPresented = true
+                                          }
+                                          
                     }
                 }
                 .fullScreenCover(isPresented: $isFullScreenPresented) {
@@ -166,3 +170,4 @@ struct MediaMessageView: View {
         }
     }
 }
+

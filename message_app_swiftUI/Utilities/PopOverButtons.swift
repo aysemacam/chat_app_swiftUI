@@ -27,7 +27,7 @@ struct PopOverButtons: View {
                 .frame(width: 100, height: 40)
         }
         .frame(width: 100, height: 120)
-        .background(Color.white.opacity(0.5))
+        .background(Color.white.opacity(0.9))
         .cornerRadius(10)
         .shadow(radius: 1)
     }
