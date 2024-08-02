@@ -12,6 +12,10 @@ import AVFoundation
 import Combine
 import CoreLocation
 
+class OverlayManager: ObservableObject {
+    @Published var showButtonsView: Bool = false
+}
+
 struct MessageView: View {
     @State var user: User
     @State private var lastMessage: String = ""
@@ -19,7 +23,7 @@ struct MessageView: View {
     @State private var isShowingCameraView = false
     @State private var isRecordingAudio = false
     @StateObject private var keyboardManager = KeyboardManager()
-    @State private var showButtonsView = false
+    @StateObject private var overlayManager = OverlayManager()
     @State private var isShowingContactPicker = false
     @State private var selectedContact: CNContact?
     @StateObject private var locationManager = LocationManager()
@@ -37,20 +41,24 @@ struct MessageView: View {
                 messagesScrollView
                 footerView
             }
+            .onTapGesture {
+                self.hideKeyboard()
+                overlayManager.showButtonsView = false
+            }
             .background(Color.lightGray)
             .padding(.top, 15)
-            .sheet(isPresented: $isShowingImagePicker, onDismiss: { showButtonsView = false }) {
+            .sheet(isPresented: $isShowingImagePicker, onDismiss: { overlayManager.showButtonsView = false }) {
                 ImagePicker { image, videoURL in
                     handleImagePicked(image: image, videoURL: videoURL)
                 }
             }
-            .fullScreenCover(isPresented: $isShowingCameraView, onDismiss: { showButtonsView = false }) {
+            .fullScreenCover(isPresented: $isShowingCameraView, onDismiss: { overlayManager.showButtonsView = false }) {
                 CustomCameraView(isPresented: $isShowingCameraView, didFinishPicking: handleImagePicked)
             }
-            .sheet(isPresented: $isShowingContactPicker, onDismiss: { showButtonsView = false }) {
+            .sheet(isPresented: $isShowingContactPicker, onDismiss: { overlayManager.showButtonsView = false }) {
                 ContactPickerView(isPresented: $isShowingContactPicker, selectedContact: $selectedContact)
             }
-            .sheet(isPresented: $isShowingMapPicker, onDismiss: { showButtonsView = false }) {
+            .sheet(isPresented: $isShowingMapPicker, onDismiss: { overlayManager.showButtonsView = false }) {
                 MapPickerView(isPresented: $isShowingMapPicker, selectedLocation: $selectedLocation)
             }
             .onChange(of: selectedContact) { contact in
@@ -59,7 +67,7 @@ struct MessageView: View {
                 }
             }
 
-            if showButtonsView {
+            if overlayManager.showButtonsView {
                 VStack {
                     Spacer()
                     HStack {
@@ -72,6 +80,8 @@ struct MessageView: View {
                         )
                         .frame(width: 110, height: 120)
                         .background(Color.clear.opacity(0.5))
+                        .opacity(overlayManager.showButtonsView ? 1 : 0)
+                        .animation(.easeInOut(duration: 0.3), value: overlayManager.showButtonsView)
                         Spacer()
                     }
                     .background(Color.clear)
@@ -79,13 +89,13 @@ struct MessageView: View {
                 }
                 .background(Color.clear)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
-                .offset(y: -keyboardManager.keyboardHeight - 80)
-//                .transition(.move(edge: .bottom))
+                .offset(y: -keyboardManager.keyboardHeight - 0)
                 .edgesIgnoringSafeArea(.all)
             }
         }
+        .environmentObject(overlayManager)
         .onReceive(locationManager.$userLocation) { newLocation in
-            if let newLocation = newLocation {
+            if newLocation != nil {
                 // location found
             } else {
                 print("Cannot find location info.")
@@ -111,9 +121,10 @@ struct MessageView: View {
             }
         }
         .navigationBarHidden(true)
-        .contentShape(Rectangle()) // To detect taps outside the keyboard
+        .contentShape(Rectangle())
         .onTapGesture {
             self.hideKeyboard()
+            overlayManager.showButtonsView = false
         }
     }
 
@@ -142,9 +153,8 @@ struct MessageView: View {
                 }
             }
             .onAppear {
-                print(user.userChat?.messages, "mmmmmm")
                 scrollViewProxy = proxy
-                scrollToBottom(proxy: proxy)
+                scrollToBottom(proxy: proxy, animated: false)
             }
             .onChange(of: user.userChat?.messages.count) { _ in
                 scrollToBottom(proxy: proxy)
@@ -163,7 +173,7 @@ struct MessageView: View {
                 SendMessageView(
                     lastMessage: $lastMessage,
                     sendMessageAction: sendMessage,
-                    plusButtonAction: { withAnimation { showButtonsView.toggle() } },
+                    plusButtonAction: { withAnimation { overlayManager.showButtonsView.toggle() } },
                     cameraButtonAction: { isShowingCameraView = true },
                     micButtonAction: { message in
                         addMessage(message)
@@ -199,9 +209,13 @@ struct MessageView: View {
         isSelectionMode = false
     }
 
-    private func scrollToBottom(proxy: ScrollViewProxy) {
+    private func scrollToBottom(proxy: ScrollViewProxy, animated: Bool = true) {
         if let lastMessage = user.userChat?.messages.last {
-            withAnimation {
+            if animated {
+                withAnimation {
+                    proxy.scrollTo(lastMessage.id, anchor: .bottom)
+                }
+            } else {
                 proxy.scrollTo(lastMessage.id, anchor: .bottom)
             }
         }
@@ -287,5 +301,6 @@ struct MessageView: View {
     
     private func hideKeyboard() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        keyboardManager.keyboardHeight = 0
     }
 }

@@ -4,7 +4,6 @@
 //
 //  Created by Aysema Çam on 25.07.2024.
 //
-
 import SwiftUI
 import MapKit
 import Contacts
@@ -15,6 +14,7 @@ struct MessageContentView: View {
     var toggleSelection: () -> Void
     @State private var isFullScreenPresented = false
     @Binding var isSelectionMode: Bool
+    @EnvironmentObject var overlayManager: OverlayManager
 
     var body: some View {
         HStack {
@@ -25,10 +25,13 @@ struct MessageContentView: View {
             }
             
             content
-                .background(.clear)
+                .background(Color.clear)
+                .contentShape(Rectangle())
                 .onTapGesture {
                     if isSelectionMode {
                         toggleSelection()
+                    } else {
+                        overlayManager.showButtonsView = false
                     }
                 }
                 .onLongPressGesture {
@@ -48,11 +51,11 @@ struct MessageContentView: View {
                     if isSelectionMode {
                         toggleSelection()
                     } else {
-                                          if case .audio = media.type {
-                                          } else {
-                                              isFullScreenPresented = true
-                                          }
-                                          
+                        if case .audio = media.type {
+                        
+                        } else {
+                            isFullScreenPresented = true
+                        }
                     }
                 }
                 .fullScreenCover(isPresented: $isFullScreenPresented) {
@@ -60,7 +63,7 @@ struct MessageContentView: View {
                 }
         } else if let contactData = message.contact, let contact = try? CNContactVCardSerialization.contacts(with: contactData).first {
             ContactMessageView(contact: contact)
-                .frame(width: 270)
+                .frame(width: 280)
                 .frame(maxWidth: .infinity, alignment: message.isIncoming ? .leading : .trailing)
                 .padding(.horizontal)
         } else if let location = message.location {
@@ -75,7 +78,7 @@ struct MessageContentView: View {
                 .fullScreenCover(isPresented: $isFullScreenPresented) {
                     FullScreenMapView(location: location, isPresented: $isFullScreenPresented)
                 }
-                .frame(width: 270)
+                .frame(width: 280)
                 .frame(maxWidth: .infinity, alignment: message.isIncoming ? .leading : .trailing)
                 .padding(.horizontal)
         }
@@ -147,7 +150,7 @@ struct MediaMessageView: View {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .frame(width: 270, height: 360)
+                    .frame(width: 280, height: 360)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
@@ -156,7 +159,7 @@ struct MediaMessageView: View {
             }
         case .video(let url):
             VideoPlayerView(videoData: url)
-                .frame(width: 270, height: 360)
+                .frame(width: 280, height: 360)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .aspectRatio(contentMode: .fill)
                 .overlay(
@@ -165,9 +168,8 @@ struct MediaMessageView: View {
                 )
         case .audio(let url):
             AudioPlayerView(audioData: url)
-                .frame(width: 270, height: 70)
+                .frame(width: 280, height: 70)
                 .cornerRadius(12)
         }
     }
 }
-

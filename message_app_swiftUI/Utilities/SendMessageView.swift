@@ -28,7 +28,7 @@ struct SendMessageView: View {
                         .resizable()
                         .frame(width: 18, height: 18)
                         .foregroundColor(.black.opacity(0.9))
-                        .padding(.top)
+                        
                 }
                 
                 TextView(text: $lastMessage, textViewHeight: $textViewHeight)
@@ -46,7 +46,7 @@ struct SendMessageView: View {
                             .frame(width: 21, height: 18)
                             .foregroundColor(.black)
                             .padding(.leading, 5)
-                            .padding(.top)
+                         
                     }
                     
                     Button(action: {}) {
@@ -55,7 +55,6 @@ struct SendMessageView: View {
                             .frame(width: 14, height: 20)
                             .foregroundColor(isPressed ? .red : .black)
                             .padding(.horizontal, 8)
-                            .padding(.top)
                             .simultaneousGesture(
                                 DragGesture(minimumDistance: 0)
                                     .onChanged { _ in
@@ -91,7 +90,6 @@ struct SendMessageView: View {
                         Text("send")
                             .frame(width: 70, height: 30)
                             .foregroundColor(.black)
-                            .padding(.top)
                     }
                 }
             }

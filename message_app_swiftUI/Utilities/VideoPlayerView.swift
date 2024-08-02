@@ -14,13 +14,13 @@ struct VideoPlayerView: View {
     var body: some View {
         if let url = saveDataToTemporaryFile(data: videoData, fileName: "tempVideo.mp4") {
             VideoThumbnailView(url: url)
-                .frame(width: 270, height: 360)
+                .frame(width: 280, height: 360)
                 .background(Color.black)
                 .cornerRadius(12)
         } else {
             Text("Unable to load video")
                 .foregroundColor(.white)
-                .frame(width: 270, height: 360)
+                .frame(width: 280, height: 360)
                 .background(Color.black)
                 .cornerRadius(12)
         }
@@ -49,12 +49,12 @@ struct VideoThumbnailView: View {
                 Image(uiImage: thumbnailImage)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .frame(width: 270, height: 360)
+                    .frame(width: 280, height: 360)
                     .clipped()
             } else {
                 Rectangle()
                     .foregroundColor(.gray)
-                    .frame(width: 270, height: 360)
+                    .frame(width: 280, height: 360)
             }
             Image(systemName: "play.circle.fill")
                 .resizable()

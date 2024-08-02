@@ -28,32 +28,33 @@ struct ContentView: View {
                                 .frame(width: 50, height: 50)
                                 .clipShape(Circle())
                                 .padding(.trailing, 10)
-
+                            
                             VStack(alignment: .leading) {
                                 Text(user.username)
                                     .font(.headline)
                                 Text(lastMessageText(for: user))
                                     .font(.subheadline)
                             }
-
+                            
                             Spacer()
-
+                            
                             Text("\(Date(), formatter: dateFormatter)")
                                 .font(.caption)
                                 .padding(.leading, 10)
                         }
                         .background(Color.white)
                     }
+                    .listRowBackground(Color.white) 
                 }
                 .listStyle(PlainListStyle())
                 .background(Color.white)
                 .navigationBarTitle("Chats", displayMode: .inline)
                 .navigationBarItems(trailing:
-                    Button(action: {
-                        showingContactPicker = true
-                    }) {
-                        Image(systemName: "plus")
-                    }
+                                        Button(action: {
+                    showingContactPicker = true
+                }) {
+                    Image(systemName: "plus")
+                }
                 )
             }
         }
@@ -97,26 +98,34 @@ struct ContentView: View {
             return user.username
         }
         
+        var messageText: String
         if let text = lastMessage.text {
-            return text
+            messageText = text
         } else if lastMessage.media != nil {
             switch lastMessage.media!.type {
             case .photo:
-                return "You sent a photo"
+                messageText = "You sent a photo"
             case .video:
-                return "You sent a video"
+                messageText = "You sent a video"
             case .audio:
-                return "You sent a sound"
+                messageText = "You sent a sound"
             }
         } else if lastMessage.location != nil {
-            return "You sent a location"
+            messageText = "You sent a location"
         } else if lastMessage.contact != nil {
-            return "You sent a person"
+            messageText = "You sent a person"
+        } else {
+            messageText = user.username
         }
         
-        return user.username
+        if let firstLine = messageText.split(separator: "\n").first {
+            return String(firstLine)
+        }
+        
+        return messageText
     }
 }
+
 
 let dateFormatter: DateFormatter = {
     let formatter = DateFormatter()
