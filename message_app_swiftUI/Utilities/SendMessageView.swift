@@ -17,11 +17,12 @@ struct SendMessageView: View {
     @State private var isCancelled = false
     @State private var recordingDuration: TimeInterval = 0.0
     @State private var timer: Timer? = nil
+    @State private var textViewHeight: CGFloat = 30
     @StateObject private var audioRecorderManager = AudioRecorderManager()
-
+    
     var body: some View {
         VStack {
-            HStack {
+            HStack(alignment: .center) {
                 Button(action: plusButtonAction) {
                     Image(systemName: "plus")
                         .resizable()
@@ -30,10 +31,13 @@ struct SendMessageView: View {
                         .padding(.top)
                 }
                 
-                TextField("", text: $lastMessage)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .frame(minHeight: 30)
-                    .padding(.top)
+                TextView(text: $lastMessage, textViewHeight: $textViewHeight)
+                    .frame(height: textViewHeight)
+                    .padding(6)
+                    .background(Color.clear)
+                    .cornerRadius(12)
+                   
+                  
                 
                 if lastMessage.isEmpty {
                     Button(action: cameraButtonAction) {
@@ -99,6 +103,8 @@ struct SendMessageView: View {
             Group {
                 if isPressed && !isCancelled {
                     RecordingOverlayView(recordingDuration: recordingDuration, stopRecording: stopRecording(cancelled:))
+                        .transition(.move(edge: .leading))
+                        .animation(.easeInOut)
                 }
             }
         )
@@ -133,3 +139,58 @@ struct SendMessageView: View {
     }
 }
 
+struct TextView: UIViewRepresentable {
+    @Binding var text: String
+    @Binding var textViewHeight: CGFloat
+
+    func makeUIView(context: Context) -> UITextView {
+        let textView = UITextView()
+        textView.isScrollEnabled = false
+        textView.backgroundColor = .clear
+        textView.font = UIFont.systemFont(ofSize: 16)
+        textView.delegate = context.coordinator
+        textView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        textView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+        textView.layer.cornerRadius = 12
+        textView.layer.borderWidth = 1
+        textView.layer.backgroundColor = UIColor.white.cgColor
+        textView.layer.borderColor = UIColor.gray.withAlphaComponent(0.5).cgColor
+        return textView
+    }
+
+    func updateUIView(_ uiView: UITextView, context: Context) {
+        uiView.text = text
+        TextView.updateHeight(of: uiView, textViewHeight: $textViewHeight)
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    class Coordinator: NSObject, UITextViewDelegate {
+        var parent: TextView
+
+        init(_ parent: TextView) {
+            self.parent = parent
+        }
+
+        func textViewDidChange(_ textView: UITextView) {
+            parent.text = textView.text
+            TextView.updateHeight(of: textView, textViewHeight: parent.$textViewHeight)
+        }
+    }
+
+    static func updateHeight(of textView: UITextView, textViewHeight: Binding<CGFloat>) {
+        let size = textView.sizeThatFits(CGSize(width: textView.frame.width, height: CGFloat.greatestFiniteMagnitude))
+        var newHeight = size.height
+        if (newHeight > 90) {
+            newHeight = 90
+            textView.isScrollEnabled = true
+        } else {
+            textView.isScrollEnabled = false
+        }
+        DispatchQueue.main.async {
+            textViewHeight.wrappedValue = newHeight
+        }
+    }
+}

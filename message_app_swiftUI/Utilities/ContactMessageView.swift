@@ -68,8 +68,7 @@ struct ContactMessageView: View {
                         NotificationCenter.default.post(name: NSNotification.Name("UserSaved"), object: nil)
                     }
                     
-                    self.isNavigatingToMessageView = false
-                    DispatchQueue.main.async {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         self.isNavigatingToMessageView = true
                     }
                 }) {
