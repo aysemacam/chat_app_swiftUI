@@ -89,7 +89,7 @@ struct MessageView: View {
                 }
                 .background(Color.clear)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
-                .offset(y: -keyboardManager.keyboardHeight - 0)
+                .offset(y: -keyboardManager.keyboardHeight - 80)
                 .edgesIgnoringSafeArea(.all)
             }
         }
@@ -154,7 +154,9 @@ struct MessageView: View {
             }
             .onAppear {
                 scrollViewProxy = proxy
-                scrollToBottom(proxy: proxy, animated: false)
+                DispatchQueue.main.async {
+                    scrollToBottom(proxy: proxy, animated: false)
+                }
             }
             .onChange(of: user.userChat?.messages.count) { _ in
                 scrollToBottom(proxy: proxy)
